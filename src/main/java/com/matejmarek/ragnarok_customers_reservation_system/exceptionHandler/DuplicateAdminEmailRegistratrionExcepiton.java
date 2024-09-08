@@ -1,0 +1,5 @@
+package com.matejmarek.ragnarok_customers_reservation_system.exceptionHandler;
+
+public class DuplicateAdminEmailRegistratrionExcepiton extends RuntimeException{
+
+}
