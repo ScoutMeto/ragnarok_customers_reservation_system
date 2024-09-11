@@ -4,6 +4,7 @@ import com.fasterxml.jackson.annotation.JsonProperty;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
+import org.springframework.beans.factory.annotation.Value;
 
 import java.sql.Time;
 import java.time.LocalDateTime;
@@ -29,8 +30,9 @@ public class TrainingDTO {
 
     private Time endOfCurrentLesson;
 
-    private int repeatIntervalInDays;
+    private int repeatIntervalInDays = 7;
 
+    @Value("0")
     private int numberOfCopyConcreteTraining;
 
 

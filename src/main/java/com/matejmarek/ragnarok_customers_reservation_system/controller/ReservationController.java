@@ -15,9 +15,10 @@ public class ReservationController {
     @Autowired
     ReservationService reservationService;
 
-    @PostMapping("/createNewReservation/api")
+    @PostMapping({"api/createNewReservation/", "api/createNewReservation"})
     public ReservationDTO addReservation(@RequestBody @Valid ReservationDTO reservationDTO) {
         System.out.println("Požadavek na vytvoření nové rezervace (ReservationController, addReservation): " + reservationDTO);
         return reservationService.createReservation(reservationDTO);
     }
+
 }
