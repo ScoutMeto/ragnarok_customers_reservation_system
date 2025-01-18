@@ -1,6 +1,5 @@
 package com.matejmarek.ragnarok_customers_reservation_system.entity;
 
-import com.matejmarek.ragnarok_customers_reservation_system.dto.ReservationDTO;
 import jakarta.persistence.*;
 import lombok.Getter;
 import lombok.Setter;
@@ -35,6 +34,6 @@ public class TrainingEntity {
 
     private int numberOfCopyConcreteTraining;
 
-    @OneToMany(mappedBy = "training", cascade = CascadeType.ALL, orphanRemoval = true)
+    @OneToMany(mappedBy = "training", cascade = CascadeType.ALL, fetch = FetchType.EAGER, orphanRemoval = true)
     private List<ReservationEntity> reservationsList;
 }

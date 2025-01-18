@@ -4,8 +4,11 @@ import com.matejmarek.ragnarok_customers_reservation_system.dto.TrainingDTO;
 import com.matejmarek.ragnarok_customers_reservation_system.dto.mapper.TrainingMapper;
 import com.matejmarek.ragnarok_customers_reservation_system.entity.TrainingEntity;
 import com.matejmarek.ragnarok_customers_reservation_system.entity.repository.TrainingRepository;
+import com.matejmarek.ragnarok_customers_reservation_system.service.AdminService;
 import com.matejmarek.ragnarok_customers_reservation_system.service.TrainingService;
 import io.swagger.annotations.Api;
+import jakarta.servlet.http.HttpServletRequest;
+import jakarta.servlet.http.HttpServletResponse;
 import jakarta.validation.Valid;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
@@ -24,6 +27,8 @@ public class TrainingController {
     TrainingService trainingService;
     @Autowired
     TrainingRepository trainingRepository;
+    @Autowired
+    AdminService adminService;
 
 
     @PostMapping({"api/createNewTraining/", "api/createNewTraining"})
@@ -46,6 +51,7 @@ public class TrainingController {
         /*
         Přidat metodu, která nalézá všechny rezervace podle ID a vkládá je do Listu ke každé TrainingEntity
         na Page (použito pro přehled: kdo je přihlášen na trénink, kolik míst je obsazených)
+         -vyřešeno načítáním EAGER
          */
         return trainingService.getTrainingsByDateRange(startDate, endDate);
     }
@@ -57,22 +63,46 @@ public class TrainingController {
         /*
         Přidat metodu, která nalézá všechny rezervace podle ID a vkládá je do Listu k TrainingEntity
         (použito pro přehled: kdo je přihlášen na trénink, kolik míst je obsazených)
+         -vyřešeno načítáním EAGER
          */
         return trainingService.getOneTrainingById(trainingId);
 
     }
 
-    @DeleteMapping("/deleteTrainingChosenInOverview/{id}")
+    @DeleteMapping({"api/deleteTrainingChosenInOverview/{id}/", "api/deleteTrainingChosenInOverview/{id}"})
     public ResponseEntity<Void> removeTraining(@PathVariable("id") Long trainingId) {
         System.out.println("Požadavek na odstranění zvoleného tréninku podle načteného ID: " + trainingId + ". Spolu s tréninkem dojde ke smazání všech rezervací.");
         trainingService.removeOneTraining(trainingId);
         return ResponseEntity.noContent().build();
     }
 
-    @DeleteMapping("/deleteTrainingsChosenInOverview/{id}")
+    @DeleteMapping({"api/deleteTrainingsChosenInOverview/{id}/", "api/deleteTrainingsChosenInOverview/{id}"})
     public ResponseEntity<Void> removeTrainings(@PathVariable("id") Long trainingId) {
         System.out.println("Požadavek na odstranění zvoleného tréninku podle načteného ID: " + trainingId + ". Spolu s tréninkem dojde ke smazání všech rezervací.");
         trainingService.removeAllPlannedTrainings(trainingId);
         return ResponseEntity.noContent().build();
     }
+
+    @PutMapping({"api/editTrainingChosenInOverview/{id}/", "api/editTrainingChosenInOverview/{id}"})
+    public TrainingDTO editTraining (@PathVariable("id") Long trainingId, @RequestBody TrainingDTO trainingDTO) {
+        System.out.println("Požadavek na odstranění zvoleného tréninku podle načteného ID: " + trainingId + ". Spolu s tréninkem dojde ke smazání všech rezervací.");
+        return trainingService.editOneTraining(trainingId, trainingDTO);
+    }
+
+    // PUT metoda pro úpravu všech následujících tréninků
+    @PutMapping({"api/editAllPlanned/{id}/", "api//editAllPlanned/{id}"})
+    public ResponseEntity<Void> editAllPlannedTrainings(@PathVariable("id") Long trainingId, @RequestBody TrainingDTO trainingDTO) {
+        trainingService.editAllPlannedTrainings(trainingId, trainingDTO);
+        return ResponseEntity.noContent().build();  // HTTP 204 No Content pokud úprava proběhne úspěšně
+    }
+
+    // Metoda pro odhlášení administrátora
+    @PostMapping("/api/logoutAdmin")
+    public ResponseEntity<String> logoutAdmin(HttpServletRequest request, HttpServletResponse response) {
+        System.out.println("Požadavek na odhlášení administrátora (AdminController, logoutAdmin)");
+
+        adminService.logout(request, response);
+        return ResponseEntity.ok("Úspěšně odhlášen.");
+    }
+
 }

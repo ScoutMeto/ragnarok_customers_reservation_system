@@ -21,4 +21,8 @@ public interface TrainingService {
     void removeOneTraining(Long trainingId);
 
     void removeAllPlannedTrainings(Long trainingId);
+
+    TrainingDTO editOneTraining(Long trainingId, TrainingDTO trainingDTO);
+
+    void editAllPlannedTrainings(Long trainingId, TrainingDTO trainingDTO);
 }

@@ -1,6 +1,8 @@
 package com.matejmarek.ragnarok_customers_reservation_system.dto.mapper;
 
+import com.matejmarek.ragnarok_customers_reservation_system.dto.ReservationDTO;
 import com.matejmarek.ragnarok_customers_reservation_system.dto.TrainingDTO;
+import com.matejmarek.ragnarok_customers_reservation_system.entity.ReservationEntity;
 import com.matejmarek.ragnarok_customers_reservation_system.entity.TrainingEntity;
 import org.mapstruct.Mapper;
 

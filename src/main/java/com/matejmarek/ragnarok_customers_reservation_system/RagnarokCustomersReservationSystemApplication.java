@@ -11,3 +11,5 @@ public class RagnarokCustomersReservationSystemApplication {
 	}
 
 }
+
+//logout admin - již existuje dotaz v chatu, je před exit a detele reservation tématem

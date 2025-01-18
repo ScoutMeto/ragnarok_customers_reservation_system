@@ -8,4 +8,6 @@ import org.springframework.stereotype.Service;
 public interface ReservationService {
 
     ReservationDTO createReservation (ReservationDTO reservationDTO);
+    ReservationDTO editReservation(Long reservationId, ReservationDTO reservationDTO);
+    void deleteReservation(Long reservationId);
 }
