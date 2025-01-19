@@ -11,6 +11,7 @@ import jakarta.persistence.EntityNotFoundException;
 import jakarta.transaction.Transactional;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 
 import java.sql.Time;
@@ -68,8 +69,8 @@ public class TrainingServiceImpl implements TrainingService {
 
     // (vyřešeno)Zisk údajů pro proměnnou List<ReservationEntity> reservationsList (každá jednotka) - vyřešeno pomocí fetch.EAGER
     @Override
-    public Page<TrainingEntity> getTrainingsByDateRange(LocalDateTime startDate, LocalDateTime endDate) {
-        return trainingRepository.findByDateBetweenMondaySunday(startDate, endDate);
+    public Page<TrainingEntity> getTrainingsByDateRange(LocalDateTime startDate, LocalDateTime endDate, Pageable pageable) {
+        return trainingRepository.findByDateBetweenMondaySunday(startDate, endDate, pageable);
     }
 
     // Přípravná metoda to delete/edit - zobrazí trénink pro úpravu po kliknutí na přehled v celém týdnu a umožní vybrat z možností: vymzat/upravit (při volbě předá ID další funkci)

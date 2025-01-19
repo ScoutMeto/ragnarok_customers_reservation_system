@@ -14,7 +14,10 @@ public interface TrainingService {
 
     TrainingDTO createTraining(TrainingDTO trainingDTO);
 
-    Page<TrainingEntity> getTrainingsByDateRange(LocalDateTime startDate, LocalDateTime endDate);
+    //Page<TrainingEntity> getTrainingsByDateRange(LocalDateTime startDate, LocalDateTime endDate);
+
+    // (vyřešeno)Zisk údajů pro proměnnou List<ReservationEntity> reservationsList (každá jednotka) - vyřešeno pomocí fetch.EAGER
+    Page<TrainingEntity> getTrainingsByDateRange(LocalDateTime startDate, LocalDateTime endDate, Pageable pageable);
 
     TrainingDTO getOneTrainingById(Long trainingId);
 

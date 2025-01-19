@@ -12,6 +12,7 @@ import jakarta.servlet.http.HttpServletResponse;
 import jakarta.validation.Valid;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 import org.springframework.format.annotation.DateTimeFormat;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
@@ -38,7 +39,7 @@ public class TrainingController {
     }
 
     @GetMapping({"api/loadAllTrainings/", "api/loadAllTrainings"})
-    public Page<TrainingEntity> getAllTrainingsForWeek(@RequestParam("startDate") @DateTimeFormat(pattern = "dd-MM-yyyy") LocalDateTime startDate) {
+    public Page<TrainingEntity> getAllTrainingsForWeek(@RequestParam("startDate") @DateTimeFormat(pattern = "dd-MM-yyyy") LocalDateTime startDate, Pageable pageable) {
         System.out.println("Požadavek na načtení všech tréninků (TrainingController, getAllTrainingsForWeek");
 
         // Primary date setup at a first page load.
@@ -53,7 +54,7 @@ public class TrainingController {
         na Page (použito pro přehled: kdo je přihlášen na trénink, kolik míst je obsazených)
          -vyřešeno načítáním EAGER
          */
-        return trainingService.getTrainingsByDateRange(startDate, endDate);
+        return trainingService.getTrainingsByDateRange(startDate, endDate, pageable);
     }
 
     @GetMapping({"api/loadOneTraining/{id}/", "api/loadOneTraining/{id}"})

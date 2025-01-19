@@ -21,6 +21,7 @@ public class AdminServiceImpl implements AdminService {
 
     @Autowired
     private AdminRepository adminRepository;
+    @Autowired
     private PasswordEncoder passwordEncoder;
 
     @Override
@@ -29,6 +30,9 @@ public class AdminServiceImpl implements AdminService {
             AdminEntity adminEntity = new AdminEntity();
             adminEntity.setAdminEmail(model.getAdminEmail());
             adminEntity.setPassword(passwordEncoder.encode(model.getPassword()));
+            adminEntity.setNickname(model.getNickname());
+            adminEntity.setAdmin(model.isAdmin()); // nastavení isAdmin
+
 
             adminEntity = adminRepository.save(adminEntity);
 
@@ -47,7 +51,7 @@ public class AdminServiceImpl implements AdminService {
 
     @Override
     public UserDetails loadUserByUsername(String adminName) throws UsernameNotFoundException {
-        return adminRepository.findByEmail(adminName)
+        return adminRepository.findByAdminEmail(adminName)
                 .orElseThrow(() -> new UsernameNotFoundException("Jméno " + adminName + " nebylo nalezeno."));
     }
 

@@ -6,7 +6,7 @@ import jakarta.validation.constraints.Size;
 import lombok.Getter;
 import lombok.Setter;
 
-@Entity(name = "reservations")
+@Entity
 @Table(name = "reservations")
 @Getter
 @Setter
@@ -18,7 +18,7 @@ public class ReservationEntity {
     private Long reservationId;
 
     @ManyToOne(fetch = FetchType.EAGER)
-    @Column(name = "training_id", nullable = false)
+    @JoinColumn(name = "training_id", nullable = false)
     private TrainingEntity training;
 
     @Column(nullable = false)

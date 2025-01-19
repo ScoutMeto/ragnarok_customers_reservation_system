@@ -8,7 +8,7 @@ import java.sql.Time;
 import java.time.LocalDateTime;
 import java.util.List;
 
-@Entity(name = "training")
+@Entity
 @Table(name = "training")
 @Getter
 @Setter
