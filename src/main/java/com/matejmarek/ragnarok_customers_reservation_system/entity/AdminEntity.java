@@ -11,7 +11,7 @@ import org.springframework.security.core.userdetails.UserDetails;
 import java.util.Collection;
 import java.util.List;
 
-@Entity
+@Entity(name = "admin")
 @Table(name = "admin")
 @Getter
 @Setter
@@ -34,9 +34,11 @@ public class AdminEntity implements UserDetails {
     @Column(nullable = false)
     private String password;
 
-
-
-
+    @Override
+    public Collection<? extends GrantedAuthority> getAuthorities() {
+        GrantedAuthority grantedAuthority = new SimpleGrantedAuthority("ROLE_" + (admin ? "ADMIN" : "USER"));
+        return List.of(grantedAuthority);
+    }
 
     @Override
     public String getUsername() {
@@ -44,8 +46,22 @@ public class AdminEntity implements UserDetails {
     }
 
     @Override
-    public Collection<? extends GrantedAuthority> getAuthorities() { //return role and rights
-        GrantedAuthority grantedAuthority = new SimpleGrantedAuthority("ROLE_" + (admin ? "ADMIN" : "USER")); //minimal one role for each user. Best way is get roles to chosen accounts manually.
-        return List.of(grantedAuthority);
+    public boolean isAccountNonExpired() {
+        return true;
+    }
+
+    @Override
+    public boolean isAccountNonLocked() {
+        return true;
+    }
+
+    @Override
+    public boolean isCredentialsNonExpired() {
+        return true;
+    }
+
+    @Override
+    public boolean isEnabled() {
+        return true;
     }
 }

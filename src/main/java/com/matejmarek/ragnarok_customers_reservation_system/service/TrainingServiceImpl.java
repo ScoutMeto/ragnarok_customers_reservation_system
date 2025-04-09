@@ -2,6 +2,7 @@ package com.matejmarek.ragnarok_customers_reservation_system.service;
 
 import com.matejmarek.ragnarok_customers_reservation_system.dto.ReservationDTO;
 import com.matejmarek.ragnarok_customers_reservation_system.dto.TrainingDTO;
+import com.matejmarek.ragnarok_customers_reservation_system.dto.TrainingResponseDTO;
 import com.matejmarek.ragnarok_customers_reservation_system.dto.mapper.ReservationMapper;
 import com.matejmarek.ragnarok_customers_reservation_system.dto.mapper.TrainingMapper;
 import com.matejmarek.ragnarok_customers_reservation_system.entity.ReservationEntity;
@@ -13,9 +14,11 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
+import java.util.stream.Collectors;
 
 import java.sql.Time;
 import java.time.LocalDateTime;
+import java.time.LocalTime;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -38,8 +41,8 @@ public class TrainingServiceImpl implements TrainingService {
         TrainingEntity dtoToEntity = trainingMapper.toEntity(trainingDTO);
         TrainingEntity savedEntity = trainingRepository.save(dtoToEntity);
 
-        // Admin set the number of copies higher than 0.
-        if (trainingDTO.getNumberOfCopyConcreteTraining() > 0) {
+        // Admin set the number of copies higher than 1.
+        if (trainingDTO.getNumberOfCopyConcreteTraining() > 1) {
             createRepeatedLessons(trainingDTO, trainingDTO.getRepeatIntervalInDays());
         }
 
@@ -56,8 +59,8 @@ public class TrainingServiceImpl implements TrainingService {
             repeatedLesson.setNameOfLesson(modelLesson.getNameOfLesson());
             repeatedLesson.setNumberOfFreeSlots(modelLesson.getNumberOfFreeSlots());
             repeatedLesson.setDateOfCurrentLesson(nextDate);
-            repeatedLesson.setStartOfCurrentLesson(modelLesson.getStartOfCurrentLesson());
-            repeatedLesson.setEndOfCurrentLesson(modelLesson.getEndOfCurrentLesson());
+            repeatedLesson.setStartOfCurrentLesson(nextDate);
+            repeatedLesson.setEndOfCurrentLesson(nextDate.plusHours(modelLesson.getEndOfCurrentLesson().getHour() - modelLesson.getStartOfCurrentLesson().getHour() + 1));
             repeatedLesson.setRepeatIntervalInDays(repeatIntervalInDays);
 
             TrainingEntity repeatedDtoToEntity = trainingMapper.toEntity(repeatedLesson);
@@ -68,9 +71,29 @@ public class TrainingServiceImpl implements TrainingService {
     }
 
     // (vyřešeno)Zisk údajů pro proměnnou List<ReservationEntity> reservationsList (každá jednotka) - vyřešeno pomocí fetch.EAGER
+//    @Override
+//    public Page<TrainingEntity> getTrainingsByDateRange(LocalDateTime startDate, LocalDateTime endDate, Pageable pageable) {
+//        System.out.println("DEBUG (Service): Hledám tréninky od " + startDate + " do " + endDate);
+//        return trainingRepository.findByDateOfCurrentLessonBetween(startDate, endDate, pageable);
+//    }
+
+    //upravena metoda výše
     @Override
-    public Page<TrainingEntity> getTrainingsByDateRange(LocalDateTime startDate, LocalDateTime endDate, Pageable pageable) {
-        return trainingRepository.findByDateBetweenMondaySunday(startDate, endDate, pageable);
+    public List<TrainingResponseDTO> getAllTrainingsAsCalendarEvents(LocalDateTime startTraining, LocalDateTime endTraining) {
+        List<TrainingEntity> trainings = trainingRepository.findByDateOfCurrentLessonBetween(startTraining, endTraining);
+
+        return trainings.stream().map(training -> {
+            TrainingResponseDTO dto = new TrainingResponseDTO();
+            dto.setTitle(training.getNameOfLesson());
+            dto.setStart(training.getStartOfCurrentLesson());
+            dto.setEnd(training.getEndOfCurrentLesson());
+            dto.setCoachName(training.getCoachName());
+//            dto.setNumberOfReservations(training.getNumberOfReservations());
+            dto.setNumberOfTotalFreeSlots(training.getNumberOfFreeSlots());
+            dto.setTrainingId(training.getTrainingId());
+            dto.setReservations(reservationMapper.toReservationDTOs(training.getReservations()));
+            return dto;
+        }).collect(Collectors.toList());
     }
 
     // Přípravná metoda to delete/edit - zobrazí trénink pro úpravu po kliknutí na přehled v celém týdnu a umožní vybrat z možností: vymzat/upravit (při volbě předá ID další funkci)
@@ -116,8 +139,8 @@ public class TrainingServiceImpl implements TrainingService {
         // Získání údajů z tréninku pro identifikaci opakujících se lekcí
         String lessonName = trainingEntity.getNameOfLesson();
         LocalDateTime lessonDate = trainingEntity.getDateOfCurrentLesson();
-        Time startTime = trainingEntity.getStartOfCurrentLesson();
-        Time endTime = trainingEntity.getEndOfCurrentLesson();
+        LocalDateTime startTime = trainingEntity.getStartOfCurrentLesson();
+        LocalDateTime endTime = trainingEntity.getEndOfCurrentLesson();
 
         // Mazání všech tréninků od daného data včetně, které splňují podmínky (shodný název, stejný čas, opakování po týdnu)
         List<TrainingEntity> plannedTrainings = trainingRepository.findAllByNameOfLessonAndStartOfCurrentLessonAndEndOfCurrentLessonAndDateOfCurrentLessonAfter(
@@ -139,7 +162,7 @@ public class TrainingServiceImpl implements TrainingService {
 
         // Přepsání hodnot na základě DTO
         trainingEntity.setNameOfLesson(trainingDTO.getNameOfLesson());
-        trainingEntity.setNumberOfReservations(trainingDTO.getNumberOfReservations());
+//        trainingEntity.setNumberOfReservations(trainingDTO.getNumberOfReservations());
         trainingEntity.setNumberOfFreeSlots(trainingDTO.getNumberOfFreeSlots());
         trainingEntity.setDateOfCurrentLesson(trainingDTO.getDateOfCurrentLesson());
         trainingEntity.setStartOfCurrentLesson(trainingDTO.getStartOfCurrentLesson());
@@ -150,7 +173,7 @@ public class TrainingServiceImpl implements TrainingService {
         // Aktualizace seznamu rezervací
         List<ReservationDTO> reservationDTOs = trainingDTO.getReservations();
         List<ReservationEntity> reservationEntities = reservationMapper.toReservationEntities(reservationDTOs);
-        trainingEntity.setReservationsList(reservationEntities);
+        trainingEntity.setReservations(reservationEntities);
 
         // Uložení změněného tréninku zpět do DB
         trainingRepository.save(trainingEntity);
@@ -178,7 +201,7 @@ public class TrainingServiceImpl implements TrainingService {
         // Pro každý z nalezených tréninků aktualizujeme hodnoty na základě DTO
         for (TrainingEntity training : trainingsToEdit) {
             training.setNameOfLesson(trainingDTO.getNameOfLesson());
-            training.setNumberOfReservations(trainingDTO.getNumberOfReservations());
+//            training.setNumberOfReservations(trainingDTO.getNumberOfReservations());
             training.setNumberOfFreeSlots(trainingDTO.getNumberOfFreeSlots());
             training.setDateOfCurrentLesson(trainingDTO.getDateOfCurrentLesson());
             training.setStartOfCurrentLesson(trainingDTO.getStartOfCurrentLesson());
@@ -187,10 +210,10 @@ public class TrainingServiceImpl implements TrainingService {
             training.setNumberOfCopyConcreteTraining(trainingDTO.getNumberOfCopyConcreteTraining());
 
             // Zachování existujících rezervací
-            List<ReservationEntity> existingReservations = training.getReservationsList();
+            List<ReservationEntity> existingReservations = training.getReservations();
             List<ReservationDTO> updatedReservationsDTOs = trainingDTO.getReservations();
             List<ReservationEntity> updatedReservationsEntities = mergeReservations(existingReservations, updatedReservationsDTOs);
-            training.setReservationsList(updatedReservationsEntities);
+            training.setReservations(updatedReservationsEntities);
 
             // Uložení upraveného tréninku
             trainingRepository.save(training);

@@ -5,8 +5,9 @@ import jakarta.persistence.*;
 import jakarta.validation.constraints.Size;
 import lombok.Getter;
 import lombok.Setter;
+import org.springframework.beans.factory.annotation.Value;
 
-@Entity
+@Entity(name = "reservations")
 @Table(name = "reservations")
 @Getter
 @Setter
@@ -34,6 +35,7 @@ public class ReservationEntity {
     private int telephoneNumber;
 
     @JsonProperty("isAdmin")
+    @Value ("false")
     private boolean admin;
 
     @Column(nullable = false)

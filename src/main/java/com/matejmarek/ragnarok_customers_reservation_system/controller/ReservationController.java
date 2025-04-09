@@ -1,13 +1,16 @@
 package com.matejmarek.ragnarok_customers_reservation_system.controller;
 
-import com.matejmarek.ragnarok_customers_reservation_system.dto.AdminDTO;
 import com.matejmarek.ragnarok_customers_reservation_system.dto.ReservationDTO;
 import com.matejmarek.ragnarok_customers_reservation_system.service.ReservationService;
 import jakarta.validation.Valid;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
+import lombok.Setter;
+import lombok.Getter;
 
+@Setter
+@Getter
 @RestController
 public class ReservationController {
 

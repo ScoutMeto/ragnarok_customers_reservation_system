@@ -1,0 +1,95 @@
+<!DOCTYPE html>
+<html lang="cs">
+<head>
+    <meta charset="UTF-8">
+    <title>Administrátorská část</title>
+    <link rel="stylesheet" href="/index-adminPart.css">
+    <script src='https://cdn.jsdelivr.net/npm/fullcalendar/index.global.min.js'></script>
+    <script src="/js/index-adminPart.js" defer></script>
+
+</head>
+<body>
+<div id='calendar'></div>
+
+
+<h1>Administrátorská část</h1>
+
+<section>
+    <h2>Tréninky - Týdenní přehled</h2>
+    <button id="prevWeek">&larr; Předchozí týden</button>
+    <button id="nextWeek">Následující týden &rarr;</button>
+    <table id="trainingTable" class="weekly-table"></table>
+</section>
+
+<!--<section>-->
+<!--    <h2>Rezervace</h2>-->
+<!--    <button onclick="getAllReservations()">Zobrazit všechny rezervace</button>-->
+<!--    <button onclick="deleteReservation()">Smazat rezervaci podle ID</button>-->
+<!--    <button onclick="deleteAllReservationsForTraining()">Smazat rezervace pro trénink</button>-->
+<!--</section>-->
+
+<!--<section>-->
+<!--    <h2>Tréninky</h2>-->
+<!--    <button onclick="getTrainingsInDateRange()">Získat tréninky v rozmezí</button>-->
+<!--    <button onclick="getAllTrainings()">Získat všechny tréninky</button>-->
+<!--    <button onclick="deleteTraining()">Smazat trénink podle ID</button>-->
+<!--    <button onclick="deleteTrainingsFromDate()">Smazat tréninky od data</button>-->
+<!--</section>-->
+
+<section>
+    <h2>Vytvořit nový trénink</h2>
+    <form id="trainingForm">
+        <label for="nameOfLesson">Název lekce:</label>
+        <input type="text" id="nameOfLesson" name="nameOfLesson" required><br><br>
+
+        <label for="coachName">Jméno trenéra:</label>
+        <input type="text" id="coachName" name="coachName" required><br><br>
+
+        <label for="startOfCurrentLesson">Začátek lekce (HH:mm):</label>
+        <input type="datetime-local" id="startOfCurrentLesson" name="startOfCurrentLesson" required><br><br>
+
+        <label for="endOfCurrentLesson">Konec lekce (HH:mm):</label>
+        <input type="datetime-local" id="endOfCurrentLesson" name="endOfCurrentLesson" required><br><br>
+
+<!--        <label for="dateOfCurrentLesson">Datum lekce:</label>-->
+<!--        <input type="datetime-local" id="dateOfCurrentLesson" name="dateOfCurrentLesson" required><br><br>-->
+
+        <label for="capacity">Kapacita:</label>
+        <input type="number" id="capacity" name="capacity" required><br><br>
+
+        <label for="repeatEveryWeek">Počet týdnů opakování (0 = bez opakování):</label>
+        <input type="number" id="repeatEveryWeek" name="repeatEveryWeek" min="0" value="0"><br><br>
+
+        <button type="submit">Vytvořit trénink</button>
+    </form>
+</section>
+
+<section>
+    <h2>Vytvořit rezervaci</h2>
+    <form id="reservationForm">
+        <label for="name">Jméno:</label>
+        <input type="text" id="name" name="name" required><br><br>
+
+        <label for="email">E-mail:</label>
+        <input type="email" id="email" name="email" required><br><br>
+
+        <label for="phone">Telefon:</label>
+        <input type="tel" id="phone" name="phone" required><br><br>
+
+        <label for="trainingId">ID tréninku:</label>
+        <input type="number" id="trainingId" name="trainingId" required><br><br>
+
+        <label for="numberOfPeople">Počet míst:</label>
+        <input type="number" id="numberOfPeople" name="numberOfPeople" required><br><br>
+
+        <button type="submit">Zarezervovat</button>
+    </form>
+</section>
+
+<section>
+    <h2>Odhlášení</h2>
+    <button onclick="logout()">Odhlásit se</button>
+</section>
+
+</body>
+</html>

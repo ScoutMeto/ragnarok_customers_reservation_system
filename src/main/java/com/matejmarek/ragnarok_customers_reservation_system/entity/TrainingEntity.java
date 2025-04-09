@@ -6,9 +6,10 @@ import lombok.Setter;
 
 import java.sql.Time;
 import java.time.LocalDateTime;
+import java.time.LocalTime;
 import java.util.List;
 
-@Entity
+@Entity(name = "training")
 @Table(name = "training")
 @Getter
 @Setter
@@ -20,20 +21,22 @@ public class TrainingEntity {
 
     private String nameOfLesson;
 
-    private int numberOfReservations;
+//    private int numberOfReservations;
 
     private int numberOfFreeSlots;
 
+    private String coachName;
+
     private LocalDateTime dateOfCurrentLesson;
 
-    private Time startOfCurrentLesson;
+    private LocalDateTime startOfCurrentLesson;
 
-    private Time endOfCurrentLesson;
+    private LocalDateTime endOfCurrentLesson;
 
     private int repeatIntervalInDays;
 
     private int numberOfCopyConcreteTraining;
 
     @OneToMany(mappedBy = "training", cascade = CascadeType.ALL, fetch = FetchType.EAGER, orphanRemoval = true)
-    private List<ReservationEntity> reservationsList;
+    private List<ReservationEntity> reservations;
 }

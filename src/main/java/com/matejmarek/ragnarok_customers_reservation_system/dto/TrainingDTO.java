@@ -8,6 +8,7 @@ import org.springframework.beans.factory.annotation.Value;
 
 import java.sql.Time;
 import java.time.LocalDateTime;
+import java.time.LocalTime;
 import java.util.List;
 
 @Data
@@ -24,13 +25,16 @@ public class TrainingDTO {
 
     private int numberOfFreeSlots;
 
+    private String coachName;
+
     private LocalDateTime dateOfCurrentLesson;
 
-    private Time startOfCurrentLesson;
+    private LocalDateTime startOfCurrentLesson;
 
-    private Time endOfCurrentLesson;
+    private LocalDateTime endOfCurrentLesson;
 
-    private int repeatIntervalInDays = 7;
+    @Value("0")
+    private int repeatIntervalInDays;
 
     @Value("0")
     private int numberOfCopyConcreteTraining;

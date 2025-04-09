@@ -4,25 +4,35 @@ import com.matejmarek.ragnarok_customers_reservation_system.dto.AdminDTO;
 import com.matejmarek.ragnarok_customers_reservation_system.entity.AdminEntity;
 import com.matejmarek.ragnarok_customers_reservation_system.entity.repository.AdminRepository;
 import com.matejmarek.ragnarok_customers_reservation_system.exceptionHandler.DuplicateAdminEmailRegistratrionExcepiton;
+import jakarta.servlet.ServletException;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.context.annotation.Lazy;
 import org.springframework.dao.DataIntegrityViolationException;
-import org.springframework.security.core.Authentication;
-import org.springframework.security.core.context.SecurityContextHolder;
+import org.springframework.http.HttpStatus;
+import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.userdetails.UserDetails;
+import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.security.crypto.password.PasswordEncoder;
-import org.springframework.security.web.authentication.logout.SecurityContextLogoutHandler;
 import org.springframework.stereotype.Service;
 
+import java.io.IOException;
+import java.security.Principal;
+
 @Service
-public class AdminServiceImpl implements AdminService {
+public class AdminServiceImpl implements AdminService, UserDetailsService {
 
     @Autowired
     private AdminRepository adminRepository;
+
+    private final PasswordEncoder passwordEncoder;
+
     @Autowired
-    private PasswordEncoder passwordEncoder;
+    public AdminServiceImpl(@Lazy PasswordEncoder passwordEncoder) {
+        this.passwordEncoder = passwordEncoder;
+    }
 
     @Override
     public AdminDTO createAdmin(AdminDTO model) {
@@ -49,21 +59,54 @@ public class AdminServiceImpl implements AdminService {
         }
     }
 
-    @Override
-    public UserDetails loadUserByUsername(String adminName) throws UsernameNotFoundException {
-        return adminRepository.findByAdminEmail(adminName)
-                .orElseThrow(() -> new UsernameNotFoundException("Jméno " + adminName + " nebylo nalezeno."));
-    }
+//    @Override
+//    public UserDetails loadUserByUsername(String adminName) throws UsernameNotFoundException {
+//        return adminRepository.findByAdminEmail(adminName)
+//                .orElseThrow(() -> new UsernameNotFoundException("Jméno " + adminName + " nebylo nalezeno."));
+//    }
+@Override
+public UserDetails loadUserByUsername(String adminEmail) throws UsernameNotFoundException {
+    AdminEntity admin = adminRepository.findByAdminEmail(adminEmail)
+            .orElseThrow(() -> new UsernameNotFoundException("Admin " + adminEmail + " nenalezen."));
+
+    return org.springframework.security.core.userdetails.User
+            .withUsername(admin.getAdminEmail())
+            .password(admin.getPassword())
+            .roles("ADMIN") // důležité pro @PreAuthorize, autorizaci a přístup
+            .build();
+
+}
 
     // Metoda pro odhlášení administrátora
     @Override
-    public void logout(HttpServletRequest request, HttpServletResponse response) {
-        Authentication auth = SecurityContextHolder.getContext().getAuthentication();
-        if (auth != null) {
-            new SecurityContextLogoutHandler().logout(request, response, auth);
-            System.out.println("Administrátor úspěšně odhlášen.");
-        } else {
-            System.out.println("Administrátor nebyl přihlášen.");
+    public void logoutAdmin(HttpServletRequest request, HttpServletResponse response)
+            throws ServletException, IOException {
+        request.logout();
+        response.sendRedirect("/index.html");
+    }
+
+    @Override
+    public void loginAdmin(AdminDTO adminDTO, HttpServletRequest request, HttpServletResponse response)
+            throws ServletException, IOException {
+        request.login(adminDTO.getAdminEmail(), adminDTO.getPassword());
+        response.sendRedirect("/index-adminPart.html");
+    }
+
+    @Override
+    public ResponseEntity<AdminDTO> getCurrentAdminInfo(HttpServletRequest request) {
+        Principal principal = request.getUserPrincipal();
+
+        if (principal instanceof AdminEntity admin) {
+            AdminDTO dto = new AdminDTO();
+            dto.setAdminEmail(admin.getAdminEmail());
+            dto.setAdminId(admin.getAdminId());
+            dto.setAdmin(admin.isAdmin());
+
+            return ResponseEntity.ok(dto);
         }
+
+        return ResponseEntity.status(HttpStatus.UNAUTHORIZED).build();
+//        return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body("Uživatel není přihlášen");
+
     }
 }
