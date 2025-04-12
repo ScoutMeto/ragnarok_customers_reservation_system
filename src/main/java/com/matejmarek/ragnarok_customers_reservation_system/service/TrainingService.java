@@ -11,6 +11,7 @@ import org.springframework.stereotype.Service;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.util.List;
+import java.util.Map;
 
 @Service
 public interface TrainingService {
@@ -20,7 +21,7 @@ public interface TrainingService {
     //Page<TrainingEntity> getTrainingsByDateRange(LocalDateTime startDate, LocalDateTime endDate);
 
     // (vyřešeno)Zisk údajů pro proměnnou List<ReservationEntity> reservationsList (každá jednotka) - vyřešeno pomocí fetch.EAGER
-    List<TrainingResponseDTO> getAllTrainingsAsCalendarEvents(LocalDateTime startTraining, LocalDateTime endTraining);
+    List<TrainingResponseDTO> getAllTrainingsAsCalendarEvents(LocalDateTime startDate, LocalDateTime endDate);
 
     TrainingDTO getOneTrainingById(Long trainingId);
 

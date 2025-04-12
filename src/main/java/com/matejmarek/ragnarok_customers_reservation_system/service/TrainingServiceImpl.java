@@ -14,6 +14,9 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
+
+import java.util.HashMap;
+import java.util.Map;
 import java.util.stream.Collectors;
 
 import java.sql.Time;
@@ -79,21 +82,26 @@ public class TrainingServiceImpl implements TrainingService {
 
     //upravena metoda výše
     @Override
-    public List<TrainingResponseDTO> getAllTrainingsAsCalendarEvents(LocalDateTime startTraining, LocalDateTime endTraining) {
-        List<TrainingEntity> trainings = trainingRepository.findByDateOfCurrentLessonBetween(startTraining, endTraining);
+    public List<TrainingResponseDTO> getAllTrainingsAsCalendarEvents(LocalDateTime startDate, LocalDateTime endDate) {
+        List<TrainingEntity> trainings = trainingRepository.findByDateOfCurrentLessonBetween(startDate, endDate);
 
         return trainings.stream().map(training -> {
             TrainingResponseDTO dto = new TrainingResponseDTO();
+            dto.setTrainingId(training.getTrainingId());
             dto.setTitle(training.getNameOfLesson());
             dto.setStart(training.getStartOfCurrentLesson());
             dto.setEnd(training.getEndOfCurrentLesson());
-            dto.setCoachName(training.getCoachName());
-//            dto.setNumberOfReservations(training.getNumberOfReservations());
-            dto.setNumberOfTotalFreeSlots(training.getNumberOfFreeSlots());
-            dto.setTrainingId(training.getTrainingId());
-            dto.setReservations(reservationMapper.toReservationDTOs(training.getReservations()));
+
+            Map<String, Object> extendedProps = new HashMap<>();
+            extendedProps.put("lessonName", training.getNameOfLesson());
+            extendedProps.put("coachName", training.getCoachName());
+            extendedProps.put("numberOfFreeSlots", training.getNumberOfFreeSlots());
+            extendedProps.put("numberOfReservations", training.getReservations().size());
+
+            dto.setExtendedProps(extendedProps);
+
             return dto;
-        }).collect(Collectors.toList());
+        }).toList();
     }
 
     // Přípravná metoda to delete/edit - zobrazí trénink pro úpravu po kliknutí na přehled v celém týdnu a umožní vybrat z možností: vymzat/upravit (při volbě předá ID další funkci)

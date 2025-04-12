@@ -15,10 +15,17 @@
 <h1>Administrátorská část</h1>
 
 <section>
-    <h2>Tréninky - Týdenní přehled</h2>
-    <button id="prevWeek">&larr; Předchozí týden</button>
-    <button id="nextWeek">Následující týden &rarr;</button>
-    <table id="trainingTable" class="weekly-table"></table>
+    <div id="eventModal" class="modal">
+        <div class="modal-content">
+            <span class="close-button">&times;</span>
+            <h3 id="modal-title"></h3>
+            <p><strong>Trenér:</strong> <span id="modal-coach"></span></p>
+            <p><strong>Kapacita:</strong> <span id="modal-capacity"></span></p>
+            <p><strong>Rezervace:</strong> <span id="modal-reservations"></span></p>
+            <p><strong>Začátek:</strong> <span id="modal-start"></span></p>
+            <p><strong>Konec:</strong> <span id="modal-end"></span></p>
+        </div>
+    </div>
 </section>
 
 <!--<section>-->
@@ -36,33 +43,61 @@
 <!--    <button onclick="deleteTrainingsFromDate()">Smazat tréninky od data</button>-->
 <!--</section>-->
 
-<section>
-    <h2>Vytvořit nový trénink</h2>
-    <form id="trainingForm">
-        <label for="nameOfLesson">Název lekce:</label>
-        <input type="text" id="nameOfLesson" name="nameOfLesson" required><br><br>
+<!--<section>-->
+<!--    <h2>Vytvořit nový trénink</h2>-->
+<!--    <form id="trainingForm">-->
+<!--        <label for="nameOfLesson">Název lekce:</label>-->
+<!--        <input type="text" id="nameOfLesson" name="nameOfLesson" required><br><br>-->
 
-        <label for="coachName">Jméno trenéra:</label>
-        <input type="text" id="coachName" name="coachName" required><br><br>
+<!--        <label for="coachName">Jméno trenéra:</label>-->
+<!--        <input type="text" id="coachName" name="coachName" required><br><br>-->
 
-        <label for="startOfCurrentLesson">Začátek lekce (HH:mm):</label>
-        <input type="datetime-local" id="startOfCurrentLesson" name="startOfCurrentLesson" required><br><br>
+<!--        <label for="startOfCurrentLesson">Začátek lekce (HH:mm):</label>-->
+<!--        <input type="datetime-local" id="startOfCurrentLesson" name="startOfCurrentLesson" required><br><br>-->
 
-        <label for="endOfCurrentLesson">Konec lekce (HH:mm):</label>
-        <input type="datetime-local" id="endOfCurrentLesson" name="endOfCurrentLesson" required><br><br>
+<!--        <label for="endOfCurrentLesson">Konec lekce (HH:mm):</label>-->
+<!--        <input type="datetime-local" id="endOfCurrentLesson" name="endOfCurrentLesson" required><br><br>-->
 
-<!--        <label for="dateOfCurrentLesson">Datum lekce:</label>-->
-<!--        <input type="datetime-local" id="dateOfCurrentLesson" name="dateOfCurrentLesson" required><br><br>-->
+<!--&lt;!&ndash;        <label for="dateOfCurrentLesson">Datum lekce:</label>&ndash;&gt;-->
+<!--&lt;!&ndash;        <input type="datetime-local" id="dateOfCurrentLesson" name="dateOfCurrentLesson" required><br><br>&ndash;&gt;-->
 
-        <label for="capacity">Kapacita:</label>
-        <input type="number" id="capacity" name="capacity" required><br><br>
+<!--        <label for="capacity">Kapacita:</label>-->
+<!--        <input type="number" id="capacity" name="capacity" required><br><br>-->
 
-        <label for="repeatEveryWeek">Počet týdnů opakování (0 = bez opakování):</label>
-        <input type="number" id="repeatEveryWeek" name="repeatEveryWeek" min="0" value="0"><br><br>
+<!--        <label for="repeatEveryWeek">Počet týdnů opakování (0 = bez opakování):</label>-->
+<!--        <input type="number" id="repeatEveryWeek" name="repeatEveryWeek" min="0" value="0"><br><br>-->
 
-        <button type="submit">Vytvořit trénink</button>
-    </form>
-</section>
+<!--        <button type="submit">Vytvořit trénink</button>-->
+<!--    </form>-->
+<!--</section>-->
+<!-- === Modální okno pro vytvoření tréninku === -->
+<div id="trainingModal" class="modal">
+    <div class="modal-content">
+        <span class="close-training-modal" style="float:right;cursor:pointer;font-size:20px;">&times;</span>
+        <h2>Vytvořit nový trénink</h2>
+        <form id="trainingForm">
+            <label for="nameOfLesson">Název lekce:</label>
+            <input type="text" id="nameOfLesson" name="nameOfLesson" required><br><br>
+
+            <label for="coachName">Jméno trenéra:</label>
+            <input type="text" id="coachName" name="coachName" required><br><br>
+
+            <label for="startOfCurrentLesson">Začátek lekce:</label>
+            <input type="datetime-local" id="startOfCurrentLesson" name="startOfCurrentLesson" required><br><br>
+
+            <label for="endOfCurrentLesson">Konec lekce:</label>
+            <input type="datetime-local" id="endOfCurrentLesson" name="endOfCurrentLesson" required><br><br>
+
+            <label for="capacity">Kapacita:</label>
+            <input type="number" id="capacity" name="capacity" required><br><br>
+
+            <label for="repeatEveryWeek">Počet týdnů opakování (0 a 1 = bez opakování):</label>
+            <input type="number" id="repeatEveryWeek" name="repeatEveryWeek" min="0" value="0"><br><br>
+
+            <button type="submit">Vytvořit trénink</button>
+        </form>
+    </div>
+</div>
 
 <section>
     <h2>Vytvořit rezervaci</h2>

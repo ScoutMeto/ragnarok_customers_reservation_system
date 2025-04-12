@@ -1,9 +1,20 @@
 document.addEventListener("DOMContentLoaded", function () {
 
+    const apiBase = '/api';
+
+    //responzivní design
+    function getResponsiveView() {
+        const width = window.innerWidth;
+        if (width < 600) return 'timeGridDay';          // mobil
+        if (width < 1024) return 'timeGridWeek';      // tablet / menší notebook
+        return 'dayGridMonth';                        // velká obrazovka
+    }
+
+
     // načtení kalendáře
     const calendarEl = document.getElementById('calendar')
     const calendar = new FullCalendar.Calendar(calendarEl, {
-        initialView: 'timeGridWeek',
+        initialView: getResponsiveView(),
         locale: 'cs',
         headerToolbar: {
             left: 'prev,next today',
@@ -16,12 +27,64 @@ document.addEventListener("DOMContentLoaded", function () {
             failure: function() {
                 alert('Chyba při načítání tréninků (calendar)!');
             }
+        },
+
+        // zobrazení pro velké obrazovky
+        eventDidMount: function (info) {
+            const width = window.innerWidth;
+            if (width >= 1024) {  // Pouze pro velké obrazovky
+                const title = info.event.extendedProps.lessonName || '?';
+                const coachNameForExtendedProps = info.event.extendedProps.coachName || '?';
+                const capacity = info.event.extendedProps.numberOfFreeSlots;
+                const reservations = info.event.extendedProps.numberOfReservations;
+
+                const extraInfo = `\nNázev lekce: ${title} \nTrenér: ${coachNameForExtendedProps}\nKapacita lekce: ${capacity} / Rezervace: ${reservations}`;
+
+                const titleEl = info.el.querySelector('.fc-event-title');
+                if (titleEl) {
+                    titleEl.innerText += extraInfo;
+                }
+            }
+        },
+
+        // Modální okno po kliknutí na lekci
+        eventClick: function (info) {
+            const width = window.innerWidth;
+            // if (width < 1024) { // zobrazit modal na mobilu / tabletu
+                const event = info.event;
+                const props = event.extendedProps;
+
+                document.getElementById('modal-title').textContent = event.title || "Neznámý název";
+                document.getElementById('modal-coach').textContent = props.coachName || "neuvedeno";
+                document.getElementById('modal-capacity').textContent = props.numberOfFreeSlots ?? "neuvedeno";
+                document.getElementById('modal-reservations').textContent = props.numberOfReservations ?? "neuvedeno";
+                document.getElementById('modal-start').textContent = new Date(event.start).toLocaleString();
+                document.getElementById('modal-end').textContent = new Date(event.end).toLocaleString();
+
+                document.getElementById('eventModal').style.display = 'block';
+            // }
+        },
+
+        // Modální okno pro "createNewTraining"
+        dateClick: function(info) {
+            // Zobraz modal
+            const modal = document.getElementById("trainingModal"); // id modálního okna
+            modal.style.display = "block";
+
+            // Předvyplnění data a času
+            const startInput = document.getElementById("startOfCurrentLesson");
+            const endInput = document.getElementById("endOfCurrentLesson");
+
+            const clickedDate = new Date(info.dateStr);
+            const defaultEnd = new Date(clickedDate);
+            defaultEnd.setHours(clickedDate.getHours() + 1);
+
+            startInput.value = clickedDate.toISOString().slice(0, 16); // yyyy-MM-ddTHH:mm
+            endInput.value = defaultEnd.toISOString().slice(0, 16);
         }
     })
-    calendar.render()
 
 
-    const apiBase = '/api';
 
 
     // // === Rezervace ===
@@ -93,6 +156,17 @@ document.addEventListener("DOMContentLoaded", function () {
     //     }
     // };
 
+
+    // Zavření modálního okna
+    document.querySelector('.close-button').addEventListener('click', function () {
+        document.getElementById('eventModal').style.display = 'none';
+    });
+
+    // Zavření modálního okno pro funkci "createNewTraining"
+    document.querySelector('.close-training-modal').addEventListener('click', function () {
+        document.getElementById("trainingModal").style.display = 'none';
+    });
+
     // === Vytvoření tréninku ===
     document.getElementById("trainingForm").addEventListener("submit", async function (e) {
         e.preventDefault();
@@ -124,6 +198,8 @@ document.addEventListener("DOMContentLoaded", function () {
 
         if (response.ok) {
             alert('Trénink vytvořen');
+            document.getElementById("trainingModal").style.display = "none";
+            calendar.refetchEvents();  // ← Zde obnovíš kalendář s novým tréninkem
         } else {
             alert('Chyba při vytváření tréninku');
         }
@@ -153,125 +229,8 @@ document.addEventListener("DOMContentLoaded", function () {
             alert('Chyba při vytváření rezervace');
         }
     });
-// });
 
 
-// Tabulka přehledu tréninků
-// document.addEventListener("DOMContentLoaded", function () {
-//     const apiBase = '/api';
 
-    // === Přepínání týdnů ===
-    let currentStartDate = getCurrentMonday();
-
-    function getCurrentMonday() {
-        const now = new Date();
-        const day = now.getDay() || 7; // Neděle jako 7
-        now.setHours(0, 0, 0, 0);
-        now.setDate(now.getDate() - day + 1);
-        return now;
-    }
-
-    function formatDate(date) {
-        const localDate = new Date(date);
-        localDate.setMinutes(localDate.getMinutes() - localDate.getTimezoneOffset());
-
-        const pad = (n) => n.toString().padStart(2, '0');
-        const year = localDate.getFullYear();
-        const month = pad(localDate.getMonth() + 1);
-        const day = pad(localDate.getDate());
-        const hours = pad(localDate.getHours());
-        const minutes = pad(localDate.getMinutes());
-
-        return `${year}-${month}-${day}T${hours}:${minutes}`; // správný formát pro LocalDateTime
-    }
-
-    // async function loadTrainingsForWeek(startDate) {
-    //     console.log("DEBUG: Spouští se loadTrainingsForWeek() s parametrem:", startDate);
-    //
-    //     const formattedDate = formatDate(startDate);
-    //     console.log("Načítám tréninky pro týden od:", formattedDate);
-    //
-    //     const response = await fetch(`${apiBase}/loadAllTrainings?startDate=${formattedDate}`);
-    //
-    //     if (!response.ok) {
-    //         console.error("Chyba při načítání tréninků:", response.status);
-    //         return;
-    //     }
-    //
-    //     const result = await response.json();
-    //
-    //     console.log("Získaná data z backendu:", result);
-    //     renderTrainingTable(result.content);
-    // }
-
-    function renderTrainingTable(trainings) {
-        console.log("DEBUG – Tréninky přijaté z backendu:", trainings);
-        const table = document.getElementById("trainingTable");
-        table.innerHTML = "";
-
-        const hours = Array.from({ length: 13 }, (_, i) => i + 8); // 8:00 - 20:00
-        const days = ["Pondělí", "Úterý", "Středa", "Čtvrtek", "Pátek", "Sobota", "Neděle"];
-
-        // Hlavička
-        const header = document.createElement("tr");
-        header.appendChild(document.createElement("th")); // Prázdný roh
-        days.forEach(day => {
-            const th = document.createElement("th");
-            th.textContent = day;
-            header.appendChild(th);
-        });
-        table.appendChild(header);
-
-        // Tělo tabulky
-        hours.forEach(hour => {
-            const row = document.createElement("tr");
-            const timeCell = document.createElement("td");
-            timeCell.textContent = `${hour}:00`;
-            row.appendChild(timeCell);
-
-            for (let dayIndex = 0; dayIndex < 7; dayIndex++) {
-                const cell = document.createElement("td");
-                const cellTrainings = trainings.filter(t => {
-                    const trainingDate = new Date(t.dateOfCurrentLesson);
-                    return trainingDate.getDay() === (dayIndex + 1) &&
-                        trainingDate.getHours() === hour;
-                });
-
-                if (cellTrainings.length > 0) {
-                    cellTrainings.forEach(t => {
-                        const div = document.createElement("div");
-                        div.className = "training-box " + getColorClass(t.nameOfLesson);
-                        div.innerHTML = `<strong>${t.nameOfLesson}</strong><br>${t.startOfCurrentLesson.slice(11,16)} - ${t.endOfCurrentLesson.slice(11,16)}<br>${t.reservations.length}/${t.numberOfFreeSlots}`;
-                        cell.appendChild(div);
-                    });
-                }
-
-                row.appendChild(cell);
-            }
-
-            table.appendChild(row);
-        });
-    }
-
-    function getColorClass(name) {
-        const lower = name.toLowerCase();
-        if (lower.includes("kettlebell")) return "type-kettlebell";
-        if (lower.includes("jóga")) return "type-yoga";
-        if (lower.includes("box")) return "type-box";
-        return "type-default";
-    }
-
-    // Tlačítka pro posun týdne
-    document.getElementById("prevWeek").addEventListener("click", () => {
-        currentStartDate.setDate(currentStartDate.getDate() - 7);
-        loadTrainingsForWeek(currentStartDate);
-    });
-
-    document.getElementById("nextWeek").addEventListener("click", () => {
-        currentStartDate.setDate(currentStartDate.getDate() + 7);
-        loadTrainingsForWeek(currentStartDate);
-    });
-
-    // Načíst aktuální týden při startu
-    loadTrainingsForWeek(currentStartDate);
+    calendar.render()
 });

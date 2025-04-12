@@ -18,7 +18,9 @@ import org.springframework.web.bind.annotation.*;
 
 import java.time.DayOfWeek;
 import java.time.LocalDateTime;
+import java.time.OffsetDateTime;
 import java.util.List;
+import java.util.Map;
 
 import lombok.Setter;
 import lombok.Getter;
@@ -92,11 +94,18 @@ public class TrainingController {
     //nahrazení metody výše
     @GetMapping({"api/loadAllTrainings/", "api/loadAllTrainings"})
     public List<TrainingResponseDTO> getTrainingsForCalendar(
-            @RequestParam("start") @DateTimeFormat(iso = DateTimeFormat.ISO.DATE_TIME) LocalDateTime start,
-            @RequestParam("end") @DateTimeFormat(iso = DateTimeFormat.ISO.DATE_TIME) LocalDateTime end) {
+//            @RequestParam("start") @DateTimeFormat(pattern = "yyyy-MM-dd'T'HH:mm") LocalDateTime startDate,
+//            @RequestParam("end") @DateTimeFormat(pattern = "yyyy-MM-dd'T'HH:mm") LocalDateTime endDate) {
 
-        System.out.println("Backend DEBUG: start=" + start + ", end=" + end);
-        return trainingService.getAllTrainingsAsCalendarEvents(start, end);
+            @RequestParam("start") OffsetDateTime start,
+            @RequestParam("end") OffsetDateTime end) {
+
+        LocalDateTime startDate = start.toLocalDateTime();
+        LocalDateTime endDate = end.toLocalDateTime();
+
+
+        System.out.println("Backend DEBUG: start=" + startDate + ", end=" + endDate);
+        return trainingService.getAllTrainingsAsCalendarEvents(startDate, endDate);
     }
 
     @GetMapping({"api/loadOneTraining/{id}/", "api/loadOneTraining/{id}"})

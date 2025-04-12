@@ -21,7 +21,7 @@ public class TrainingDTO {
 
     private String nameOfLesson;
 
-    private int numberOfReservations;
+//    private int numberOfReservations;
 
     private int numberOfFreeSlots;
 
