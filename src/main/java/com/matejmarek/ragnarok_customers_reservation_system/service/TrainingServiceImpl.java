@@ -92,11 +92,28 @@ public class TrainingServiceImpl implements TrainingService {
             dto.setStart(training.getStartOfCurrentLesson());
             dto.setEnd(training.getEndOfCurrentLesson());
 
+            //načtení rezervací a uložení do DTOs
+            List<ReservationDTO> reservationDTOs = training.getReservations().stream()
+                    .map(reservationMapper::toDTO)
+                    .collect(Collectors.toList());
+            dto.setReservations(reservationDTOs);
+
+            // Kontrola počtu rezervovaných míst a jejich případné započítání do celkového počtu rezervací
+            int extraReservations = 0;
+            for (ReservationDTO reservationDTO : reservationDTOs) {
+                int checkingNumberOfReservations = reservationDTO.getNumberOfBookedEntries();
+                if (checkingNumberOfReservations > 1) {
+                    extraReservations += reservationDTO.getNumberOfBookedEntries()-1;
+                }
+            }
+
+            // ExtendedProps jako další data, která fullCalendar běžně nedistribuuje a proto musejí být odeslány takto
             Map<String, Object> extendedProps = new HashMap<>();
             extendedProps.put("lessonName", training.getNameOfLesson());
             extendedProps.put("coachName", training.getCoachName());
             extendedProps.put("numberOfFreeSlots", training.getNumberOfFreeSlots());
-            extendedProps.put("numberOfReservations", training.getReservations().size());
+            extendedProps.put("numberOfReservations", ((training.getReservations().size())) + extraReservations);
+            extendedProps.put("reservations", reservationDTOs);
 
             dto.setExtendedProps(extendedProps);
 

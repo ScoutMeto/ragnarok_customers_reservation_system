@@ -11,11 +11,11 @@ import org.mapstruct.MappingTarget;
 @Mapper(componentModel = "spring", uses = {ReservationMapper.class})
 public interface TrainingMapper {
 
-    @Mapping(target = "trainingId", ignore = true) // ID generuje DB
-    @Mapping(target = "reservations", ignore = true)
+//    @Mapping(target = "trainingId", ignore = true) // ID generuje DB
+//    @Mapping(target = "reservations", ignore = true)
     TrainingEntity toEntity(TrainingDTO dto);
 
-    @Mapping(target = "reservations", ignore = true)
+//    @Mapping(target = "reservations", ignore = true)
     TrainingDTO toDTO(TrainingEntity entity);
 
 }

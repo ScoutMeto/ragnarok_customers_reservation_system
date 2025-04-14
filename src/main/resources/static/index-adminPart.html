@@ -24,6 +24,22 @@
             <p><strong>Rezervace:</strong> <span id="modal-reservations"></span></p>
             <p><strong>Začátek:</strong> <span id="modal-start"></span></p>
             <p><strong>Konec:</strong> <span id="modal-end"></span></p>
+
+            <div id="trainingActions">
+                <h4>Akce s tréninkem</h4>
+                <button id="deleteTrainingBtn">🗑️ Smazat trénink</button>
+                <button id="deleteTrainingsSeriesBtn">🗑️ Smazat sérii tréninků</button>
+                <button id="editTrainingBtn">✏️ Upravit trénink</button>
+                <button id="editTrainingsSeriesBtn">✏️ Upravit sérii tréninků</button>
+                <button id="createReservationBtn">➕ Vytvořit rezervaci</button>
+            </div>
+
+            <hr>
+
+            <div id="reservationsList">
+                <h4>Rezervace</h4>
+                <ul id="reservationsContainer"></ul>
+            </div>
         </div>
     </div>
 </section>
@@ -95,6 +111,33 @@
             <input type="number" id="repeatEveryWeek" name="repeatEveryWeek" min="0" value="0"><br><br>
 
             <button type="submit">Vytvořit trénink</button>
+        </form>
+    </div>
+</div>
+
+<!-- === Modální okno pro úpravu rezervace  === -->
+<div id="reservationEditModal" class="modal">
+    <div class="modal-content">
+        <span class="close-reservation-modal">&times;</span>
+        <h3>Úprava rezervace</h3>
+        <form id="editReservationForm">
+            <input type="hidden" id="editReservationId">
+            <label for="editName">Jméno:</label>
+            <input type="text" id="editName" required><br>
+
+            <label for="editSurname">Příjmení:</label>
+            <input type="text" id="editSurname" required><br>
+
+            <label for="editEmail">E-mail:</label>
+            <input type="email" id="editEmail" required><br>
+
+            <label for="editPhone">Telefon:</label>
+            <input type="text" id="editPhone" required><br>
+
+            <label for="editPeople">Počet osob:</label>
+            <input type="number" id="editPeople" min="1" required><br><br>
+
+            <button type="submit">💾 Uložit změny</button>
         </form>
     </div>
 </div>

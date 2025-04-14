@@ -63,6 +63,33 @@ document.addEventListener("DOMContentLoaded", function () {
 
                 document.getElementById('eventModal').style.display = 'block';
             // }
+
+
+            // Načti rezervace
+            const reservations = props.reservations || [];
+
+            const listContainer = document.getElementById("reservationsContainer");
+            listContainer.innerHTML = ""; // reset
+
+            if (reservations.length === 0) {
+                listContainer.innerHTML = "<i>Žádné rezervace</i>";
+            }
+
+            reservations.forEach(res => {
+                const li = document.createElement("li");
+                li.textContent = `${res.firstName} ${res.secondName}, ${res.userEmail}, ${res.telephoneNumber}, ${res.numberOfBookedEntries} (počet osob)`;
+                li.style.cursor = "pointer";
+                li.addEventListener("click", () => {
+                    if (confirm("Upravit nebo smazat rezervaci?")) {
+                        // TODO: Otevři modal s úpravou nebo potvrzením smazání
+                        alert(`TODO: Implementace úpravy nebo mazání rezervace ID: ${res.reservationId}`);
+                    }
+                });
+                listContainer.appendChild(li);
+            });
+
+            document.getElementById('eventModal').style.display = 'block';
+
         },
 
         // Modální okno pro "createNewTraining"
@@ -83,6 +110,18 @@ document.addEventListener("DOMContentLoaded", function () {
             endInput.value = defaultEnd.toISOString().slice(0, 16);
         }
     })
+
+    // Funkce pro otevření modalu pro úpravu rezervace
+    function openReservationEditModal(reservation) {
+        document.getElementById('editReservationId').value = reservation.reservationId;
+        document.getElementById('editName').value = reservation.firstName;
+        document.getElementById('editSurname').value = reservation.secondName;
+        document.getElementById('editEmail').value = reservation.userEmail;
+        document.getElementById('editPhone').value = reservation.telephoneNumber;
+        document.getElementById('editPeople').value = reservation.numberOfBookedEntries;
+
+        document.getElementById('reservationEditModal').style.display = 'block';
+    }
 
 
 
@@ -167,6 +206,11 @@ document.addEventListener("DOMContentLoaded", function () {
         document.getElementById("trainingModal").style.display = 'none';
     });
 
+    // Zavření modálního okno pro funkci "reservationEdit"
+    document.querySelector('.close-reservation-modal').onclick = () => {
+        document.getElementById('reservationEditModal').style.display = 'none';
+    };
+
     // === Vytvoření tréninku ===
     document.getElementById("trainingForm").addEventListener("submit", async function (e) {
         e.preventDefault();
@@ -233,4 +277,39 @@ document.addEventListener("DOMContentLoaded", function () {
 
 
     calendar.render()
+
+
+    // Tlačítka pro správu tréninku
+    document.getElementById("deleteTrainingBtn").addEventListener("click", async () => {
+        const trainingId = window.selectedTrainingId;
+        if (confirm("Opravdu chceš smazat tento trénink a jeho rezervace?")) {
+            await fetch(`/api/deleteTrainingChosenInOverview/${trainingId}`, { method: 'DELETE' });
+            calendar.refetchEvents();
+            document.getElementById("eventModal").style.display = "none";
+        }
+    });
+
+    document.getElementById("deleteTrainingsSeriesBtn").addEventListener("click", async () => {
+        const trainingId = window.selectedTrainingId;
+        if (confirm("Opravdu chceš smazat tento trénink a všechny jeho opakování + rezervace?")) {
+            await fetch(`/api/deleteTrainingsChosenInOverview/${trainingId}`, { method: 'DELETE' });
+            calendar.refetchEvents();
+            document.getElementById("eventModal").style.display = "none";
+        }
+    });
+
+    document.getElementById("editTrainingBtn").addEventListener("click", () => {
+        alert("TODO: Otevři modální okno pro úpravu jednoho tréninku.");
+        // TODO: připrav formulář pro úpravu (další modal)
+    });
+
+    document.getElementById("editTrainingsSeriesBtn").addEventListener("click", () => {
+        alert("TODO: Otevři modální okno pro úpravu série tréninků.");
+        // TODO: připrav formulář pro úpravu série
+    });
+
+    document.getElementById("createReservationBtn").addEventListener("click", () => {
+        alert("TODO: Otevři formulář pro vytvoření rezervace k tomuto tréninku.");
+        // TODO: otevři modal s předvyplněným trainingId
+    });
 });

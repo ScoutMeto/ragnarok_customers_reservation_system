@@ -35,8 +35,8 @@ public class ReservationEntity {
     private int telephoneNumber;
 
     @JsonProperty("isAdmin")
-    @Value ("false")
-    private boolean admin;
+//    @Value ("false")
+    private boolean admin = false;
 
     @Column(nullable = false)
     @Size(max = 8)
