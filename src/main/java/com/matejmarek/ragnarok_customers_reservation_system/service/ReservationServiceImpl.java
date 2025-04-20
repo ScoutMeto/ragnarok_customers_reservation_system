@@ -1,9 +1,13 @@
 package com.matejmarek.ragnarok_customers_reservation_system.service;
 
 import com.matejmarek.ragnarok_customers_reservation_system.dto.ReservationDTO;
+import com.matejmarek.ragnarok_customers_reservation_system.dto.TrainingDTO;
 import com.matejmarek.ragnarok_customers_reservation_system.dto.mapper.ReservationMapper;
+import com.matejmarek.ragnarok_customers_reservation_system.dto.mapper.TrainingMapperImpl;
 import com.matejmarek.ragnarok_customers_reservation_system.entity.ReservationEntity;
+import com.matejmarek.ragnarok_customers_reservation_system.entity.TrainingEntity;
 import com.matejmarek.ragnarok_customers_reservation_system.entity.repository.ReservationRepository;
+import com.matejmarek.ragnarok_customers_reservation_system.entity.repository.TrainingRepository;
 import jakarta.persistence.EntityNotFoundException;
 import jakarta.transaction.Transactional;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -17,17 +21,41 @@ public class ReservationServiceImpl implements ReservationService {
 
     @Autowired
     ReservationMapper reservationMapper;
+    @Autowired
+    TrainingService trainingService;
+    @Autowired
+    TrainingMapperImpl trainingMapper;
+    @Autowired
+    TrainingRepository trainingRepository;
 
-    @Override
-    @Transactional
-    public ReservationDTO createReservation (ReservationDTO reservationDTO) {
+//    @Override
+//    @Transactional
+//    public ReservationDTO createReservation (ReservationDTO reservationDTO) {
+//
+//        TrainingDTO trainingDTO = trainingService.getOneTrainingById(reservationDTO.getTrainingId());
+//
+//        reservationDTO.setTraining(trainingMapper.toEntity(trainingDTO));
+//
+//        ReservationEntity dtoToEntity = reservationMapper.toEntity(reservationDTO);
+//        ReservationEntity savedEntity = reservationRepository.save(dtoToEntity);
+//
+//        System.out.println("Rezervace uložena: " + reservationDTO);
+//        return reservationDTO;
+//    }
+@Override
+@Transactional
+public ReservationDTO createReservation(ReservationDTO reservationDTO) {
+    TrainingEntity trainingEntity = trainingRepository.findById(reservationDTO.getTrainingId())
+            .orElseThrow(() -> new EntityNotFoundException("Trénink s ID " + reservationDTO.getTrainingId() + " nenalezen."));
 
-        ReservationEntity dtoToEntity = reservationMapper.toEntity(reservationDTO);
-        ReservationEntity savedEntity = reservationRepository.save(dtoToEntity);
+    ReservationEntity reservationEntity = reservationMapper.toEntity(reservationDTO);
+    reservationEntity.setTraining(trainingEntity); // správné přiřazení
 
-        System.out.println("Rezervace uložena: " + reservationDTO);
-        return reservationDTO;
-    }
+    reservationRepository.save(reservationEntity);
+
+    System.out.println("Rezervace uložena: " + reservationDTO);
+    return reservationDTO;
+}
 
     @Override
     @Transactional

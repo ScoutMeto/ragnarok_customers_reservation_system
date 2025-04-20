@@ -20,10 +20,10 @@ public interface TrainingRepository extends JpaRepository<TrainingEntity, Long>,
     List<TrainingEntity> findByDateOfCurrentLessonBetween(@Param ("startDate") LocalDateTime startDate,
                                            @Param("endDate") LocalDateTime endDate);
 
-    List<TrainingEntity> findAllByNameOfLessonAndStartOfCurrentLessonAndEndOfCurrentLessonAndDateOfCurrentLessonAfter(String lessonName, LocalDateTime startTime, LocalDateTime endTime, LocalDateTime localDateTime);
+    List<TrainingEntity> findAllByNameOfLessonAndStartOfCurrentLesson(String nameOfLesson, LocalDateTime startOfCurrentLesson);
 
-    List<TrainingEntity> findByNameOfLessonAndStartOfCurrentLessonAndDateOfCurrentLessonGreaterThanEqual(
-            String nameOfLesson, LocalDateTime startOfCurrentLesson, LocalDateTime dateOfCurrentLesson);
+    List<TrainingEntity> findByNameOfLessonAndStartOfCurrentLesson(
+            String nameOfLesson, LocalDateTime startOfCurrentLesson);
 
 
 }

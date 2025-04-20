@@ -2,6 +2,7 @@ package com.matejmarek.ragnarok_customers_reservation_system.entity;
 
 import com.fasterxml.jackson.annotation.JsonProperty;
 import jakarta.persistence.*;
+import jakarta.validation.constraints.Max;
 import jakarta.validation.constraints.Size;
 import lombok.Getter;
 import lombok.Setter;
@@ -38,9 +39,9 @@ public class ReservationEntity {
 //    @Value ("false")
     private boolean admin = false;
 
-    @Column(nullable = false)
-    @Size(max = 8)
-    private Integer numberOfBookedEntries;
+//    @Column(nullable = false)
+    @Max(8)
+    private int numberOfBookedEntries;
 
     @Column(nullable = false)
     private boolean trainingPassedOrDeleted;

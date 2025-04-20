@@ -40,6 +40,7 @@ public class ReservationMapper {
         entity.setUserEmail(dto.getUserEmail());
         entity.setTelephoneNumber(dto.getTelephoneNumber());
         entity.setNumberOfBookedEntries(dto.getNumberOfBookedEntries());
+        entity.setTraining(dto.getTraining());
         // POZOR: TrainingEntity ani pole `trainingPassedOrDeleted` tu nenastavuj, pokud to neřešíš ručně v Service
 
         return entity;

@@ -83,4 +83,10 @@
     cursor: pointer;
 }
 
+.close-reservation-modal {
+    float: right;
+    font-size: 24px;
+    font-weight: bold;
+    cursor: pointer;
+}
 /*konec css k modalu*/

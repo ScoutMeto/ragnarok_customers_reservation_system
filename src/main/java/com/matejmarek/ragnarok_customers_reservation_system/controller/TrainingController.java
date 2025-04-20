@@ -2,25 +2,19 @@ package com.matejmarek.ragnarok_customers_reservation_system.controller;
 
 import com.matejmarek.ragnarok_customers_reservation_system.dto.TrainingDTO;
 import com.matejmarek.ragnarok_customers_reservation_system.dto.TrainingResponseDTO;
-import com.matejmarek.ragnarok_customers_reservation_system.dto.mapper.TrainingMapper;
-import com.matejmarek.ragnarok_customers_reservation_system.entity.TrainingEntity;
+import com.matejmarek.ragnarok_customers_reservation_system.dto.mapper.TrainingMapperImpl;
 import com.matejmarek.ragnarok_customers_reservation_system.entity.repository.TrainingRepository;
 import com.matejmarek.ragnarok_customers_reservation_system.service.AdminService;
 import com.matejmarek.ragnarok_customers_reservation_system.service.TrainingService;
 import io.swagger.annotations.Api;
 import jakarta.validation.Valid;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.data.domain.Page;
-import org.springframework.data.domain.Pageable;
-import org.springframework.format.annotation.DateTimeFormat;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
-import java.time.DayOfWeek;
 import java.time.LocalDateTime;
 import java.time.OffsetDateTime;
 import java.util.List;
-import java.util.Map;
 
 import lombok.Setter;
 import lombok.Getter;
@@ -38,7 +32,7 @@ public class TrainingController {
     @Autowired
     AdminService adminService;
     @Autowired
-    TrainingMapper trainingMapper;
+    TrainingMapperImpl trainingMapper;
 
 
     @PostMapping({"api/createNewTraining/", "api/createNewTraining"})
@@ -94,8 +88,6 @@ public class TrainingController {
     //nahrazení metody výše
     @GetMapping({"api/loadAllTrainings/", "api/loadAllTrainings"})
     public List<TrainingResponseDTO> getTrainingsForCalendar(
-//            @RequestParam("start") @DateTimeFormat(pattern = "yyyy-MM-dd'T'HH:mm") LocalDateTime startDate,
-//            @RequestParam("end") @DateTimeFormat(pattern = "yyyy-MM-dd'T'HH:mm") LocalDateTime endDate) {
 
             @RequestParam("start") OffsetDateTime start,
             @RequestParam("end") OffsetDateTime end) {
@@ -135,15 +127,17 @@ public class TrainingController {
         return ResponseEntity.noContent().build();
     }
 
-    @PutMapping({"api/editTrainingChosenInOverview/{id}/", "api/editTrainingChosenInOverview/{id}"})
-    public TrainingDTO editTraining (@PathVariable("id") Long trainingId, @RequestBody TrainingDTO trainingDTO) {
-        System.out.println("Požadavek na úpravu zvoleného tréninku podle načteného ID: " + trainingId + ". Spolu s tréninkem dojde ke smazání všech rezervací.");
+    // PUT metoda pro úpravu jednoho vybraného tréninku
+    @PutMapping({"api/editTrainingChosenInOverview/{trainingId}/", "api/editTrainingChosenInOverview/{trainingId}"})
+    public TrainingDTO editTraining (@PathVariable("trainingId") Long trainingId, @RequestBody TrainingDTO trainingDTO) {
+        System.out.println("Požadavek na úpravu zvoleného tréninku podle načteného ID: " + trainingId + ". Nedojde ke smazání rezervací.");
         return trainingService.editOneTraining(trainingId, trainingDTO);
     }
 
     // PUT metoda pro úpravu všech následujících tréninků, včetně aktuálně vybraného
-    @PutMapping({"api/editAllPlanned/{id}/", "api/editAllPlanned/{id}"})
-    public ResponseEntity<Void> editAllPlannedTrainings(@PathVariable("id") Long trainingId, @RequestBody TrainingDTO trainingDTO) {
+    @PutMapping({"api/editAllPlanned/{trainingId}/", "api/editAllPlanned/{trainingId}"})
+    public ResponseEntity<Void> editAllPlannedTrainings(@PathVariable("trainingId") Long trainingId, @RequestBody TrainingDTO trainingDTO) {
+        System.out.println("Požadavek na úpravu zvoleného tréninku a všech následujících (v odpovídajícím čase, s totožným názvem, o týden později) podle načteného ID: " + trainingId + ". Nedojde ke smazání rezervací.");
         trainingService.editAllPlannedTrainings(trainingId, trainingDTO);
         return ResponseEntity.noContent().build();  // HTTP 204 No Content pokud úprava proběhne úspěšně
     }

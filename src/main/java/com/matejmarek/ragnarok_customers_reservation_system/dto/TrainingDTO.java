@@ -33,7 +33,7 @@ public class TrainingDTO {
 
     private LocalDateTime endOfCurrentLesson;
 
-    @Value("0")
+    @Value("7")
     private int repeatIntervalInDays;
 
     @Value("0")

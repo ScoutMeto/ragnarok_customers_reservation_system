@@ -11,9 +11,11 @@ import org.springframework.beans.factory.annotation.Value;
 @Data
 @NoArgsConstructor
 @AllArgsConstructor
-public class ReservationDTO {
+public class ReservationDTO{
 
     private TrainingEntity training;
+
+    private Long trainingId;
 
     @JsonProperty("reservation_id")
     private Long reservationId;
@@ -27,8 +29,7 @@ public class ReservationDTO {
 
     private int telephoneNumber;
 
-    @Value("1")
-    private Integer numberOfBookedEntries;
+    private int numberOfBookedEntries = 1;
 
     @Value("true")
     private boolean trainingPassedOrDeleted; //true = pass; false = delete
