@@ -11,19 +11,23 @@ import org.springframework.stereotype.Repository;
 import java.time.LocalDateTime;
 import java.time.LocalTime;
 import java.util.List;
+import java.util.Optional;
+
 @Repository
 public interface TrainingRepository extends JpaRepository<TrainingEntity, Long>, JpaSpecificationExecutor<TrainingEntity> {
-
-//    @Query("SELECT t FROM TrainingEntity t LEFT JOIN FETCH t.reservationsList WHERE t.dateOfCurrentLesson BETWEEN :startDate AND :endDate")
-//    Page<TrainingEntity> findByDateBetween(@Param ("startDate") LocalDateTime startDate, @Param("endDate") LocalDateTime endDate, Pageable pageable);
 
     List<TrainingEntity> findByDateOfCurrentLessonBetween(@Param ("startDate") LocalDateTime startDate,
                                            @Param("endDate") LocalDateTime endDate);
 
     List<TrainingEntity> findAllByNameOfLessonAndStartOfCurrentLesson(String nameOfLesson, LocalDateTime startOfCurrentLesson);
 
-    List<TrainingEntity> findByNameOfLessonAndStartOfCurrentLesson(
+    Optional<TrainingEntity> findByNameOfLessonAndStartOfCurrentLesson(
             String nameOfLesson, LocalDateTime startOfCurrentLesson);
+
+//    List<TrainingEntity> findByParentTrainingId(Long parentTrainingId);
+
+    List<TrainingEntity> findByParentTrainingIdAndStartOfCurrentLessonGreaterThanEqual(Long parentTrainingId, LocalDateTime startOfCurrentLesson);
+
 
 
 }

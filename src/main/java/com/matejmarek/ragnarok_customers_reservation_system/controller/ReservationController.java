@@ -25,14 +25,14 @@ public class ReservationController {
 
     // PUT endpoint pro úpravu rezervace
     @PutMapping({"/api/editReservation/{reservationId}/", "/api/editReservation/{reservationId}"})
-    public ReservationDTO editReservation(@PathVariable Long reservationId, @RequestBody @Valid ReservationDTO reservationDTO) {
+    public ReservationDTO editReservation(@PathVariable("reservationId") Long reservationId, @RequestBody @Valid ReservationDTO reservationDTO) {
         System.out.println("Požadavek na úpravu rezervace (ReservationController, editReservation): " + reservationId);
         return reservationService.editReservation(reservationId, reservationDTO);
     }
 
     // DELETE endpoint pro smazání rezervace
     @DeleteMapping({"/api/deleteReservation/{reservationId}/", "/api/deleteReservation/{reservationId}"})
-    public ResponseEntity<String> deleteReservation(@PathVariable Long reservationId) {
+    public ResponseEntity<String> deleteReservation(@PathVariable("reservationId") Long reservationId) {
         System.out.println("Požadavek na smazání rezervace (ReservationController, deleteReservation): " + reservationId);
         reservationService.deleteReservation(reservationId);
         return ResponseEntity.ok("Rezervace byla úspěšně smazána.");

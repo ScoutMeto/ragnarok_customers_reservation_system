@@ -21,8 +21,6 @@ public class TrainingEntity {
 
     private String nameOfLesson;
 
-//    private int numberOfReservations;
-
     private int numberOfFreeSlots;
 
     private String coachName;
@@ -36,6 +34,8 @@ public class TrainingEntity {
     private int repeatIntervalInDays;
 
     private int numberOfCopyConcreteTraining;
+
+    private Long parentTrainingId;
 
     @OneToMany(mappedBy = "training", cascade = CascadeType.ALL, fetch = FetchType.EAGER, orphanRemoval = true)
     private List<ReservationEntity> reservations;

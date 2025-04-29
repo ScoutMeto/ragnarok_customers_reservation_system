@@ -13,7 +13,6 @@ public class TrainingResponseDTO {
     private String title;
     private LocalDateTime start;
     private LocalDateTime end;
-//    private String coachName;
     private int numberOfTotalFreeSlots;
     private Long trainingId;
 

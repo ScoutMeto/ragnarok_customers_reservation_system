@@ -4,8 +4,10 @@ import com.fasterxml.jackson.annotation.JsonProperty;
 import jakarta.validation.constraints.Email;
 import jakarta.validation.constraints.Size;
 import lombok.*;
+import lombok.Getter;
+import lombok.Setter;
 
-@Data
+//@Data
 @NoArgsConstructor
 @AllArgsConstructor
 @Getter
@@ -15,14 +17,14 @@ public class AdminDTO {
     @JsonProperty("user_id")
     private Long adminId;
 
-    private String nickname;
-
     @Email
     private String adminEmail;
 
-    @Size(min = 6, message = "Použij minimálně 6 znaků.")
-    private String password;
+    private String nickname;
 
     @JsonProperty("isAdmin")
     private boolean admin;
+
+    @Size(min = 6, message = "Použij minimálně 6 znaků.")
+    private String password;
 }

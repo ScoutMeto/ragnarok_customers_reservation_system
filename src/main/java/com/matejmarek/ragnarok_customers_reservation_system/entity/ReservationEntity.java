@@ -14,7 +14,6 @@ import org.springframework.beans.factory.annotation.Value;
 @Setter
 public class ReservationEntity {
 
-
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long reservationId;

@@ -142,6 +142,18 @@
     </div>
 </div>
 
+<!-- === Modal pro volbu editace nebo mazání === -->
+<div id="reservationOptionsModal" class="modal">
+    <div class="modal-content">
+        <span class="close close-options-modal">&times;</span>
+        <h2>Co chcete provést s rezervací?</h2>
+        <div class="button-group">
+            <button id="editReservationBtn">Upravit rezervaci</button>
+            <button id="deleteReservationBtn">Smazat rezervaci</button>
+        </div>
+    </div>
+</div>
+
 <!-- === Modální okno pro vytvoření rezervace === -->
 <div id="reservationModal" class="modal" style="display: none;">
     <div class="modal-content">
@@ -174,7 +186,7 @@
 
 <section>
     <h2>Odhlášení</h2>
-    <button onclick="logout()">Odhlásit se</button>
+    <button id="logoutBtn">Odhlásit se</button>
 </section>
 
 </body>

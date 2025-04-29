@@ -2,7 +2,7 @@ package com.matejmarek.ragnarok_customers_reservation_system.controller;
 
 import com.matejmarek.ragnarok_customers_reservation_system.dto.TrainingDTO;
 import com.matejmarek.ragnarok_customers_reservation_system.dto.TrainingResponseDTO;
-import com.matejmarek.ragnarok_customers_reservation_system.dto.mapper.TrainingMapperImpl;
+import com.matejmarek.ragnarok_customers_reservation_system.dto.mapper.TrainingMapper;
 import com.matejmarek.ragnarok_customers_reservation_system.entity.repository.TrainingRepository;
 import com.matejmarek.ragnarok_customers_reservation_system.service.AdminService;
 import com.matejmarek.ragnarok_customers_reservation_system.service.TrainingService;
@@ -31,8 +31,7 @@ public class TrainingController {
     TrainingRepository trainingRepository;
     @Autowired
     AdminService adminService;
-    @Autowired
-    TrainingMapperImpl trainingMapper;
+
 
 
     @PostMapping({"api/createNewTraining/", "api/createNewTraining"})
@@ -41,51 +40,7 @@ public class TrainingController {
         return trainingService.createTraining(trainingDTO);
     }
 
-//    @GetMapping({"api/loadAllTrainings/", "api/loadAllTrainings"})
-//    public Page<TrainingEntity> getAllTrainingsForWeek(@RequestParam("startDate") @DateTimeFormat(pattern = "dd-MM-yyyy'T'HH:mm") LocalDateTime startDate, Pageable pageable) {
-//        System.out.println("Požadavek na načtení všech tréninků (TrainingController, getAllTrainingsForWeek");
-//
-//        // Primary date setup at a first page load.
-//        if (startDate == null) {
-//            startDate = LocalDateTime.now().with(DayOfWeek.MONDAY).toLocalDate().atStartOfDay();
-//        }
-//
-//        LocalDateTime endDate = startDate.plusDays(6);
-//
-//        /*
-//        Přidat metodu, která nalézá všechny rezervace podle ID a vkládá je do Listu ke každé TrainingEntity
-//        na Page (použito pro přehled: kdo je přihlášen na trénink, kolik míst je obsazených)
-//         -vyřešeno načítáním EAGER
-//         */
-//        return trainingService.getTrainingsByDateRange(startDate, endDate, pageable);
-//    }
 
-//    @GetMapping({"api/loadAllTrainings/", "api/loadAllTrainings"})
-//    public TrainingResponseDTO getAllTrainingsForWeek(@RequestParam("startDate") @DateTimeFormat(pattern = "dd-MM-yyyy'T'HH:mm") LocalDateTime startDate, Pageable pageable) {
-//        System.out.println("Požadavek na načtení všech tréninků (TrainingController, getAllTrainingsForWeek)");
-//
-//        // Primary date setup at a first page load.
-//        if (startDate == null) {
-//            startDate = LocalDateTime.now().with(DayOfWeek.MONDAY).toLocalDate().atStartOfDay();
-//        }
-//
-//        LocalDateTime endDate = startDate.plusDays(6);
-//
-//        Page<TrainingEntity> page = trainingService.getTrainingsByDateRange(startDate, endDate, pageable);
-//
-//        List<TrainingDTO> dtoList = page.getContent().stream()
-//                .map(trainingMapper::toDTO)
-//                .toList();
-//
-//        TrainingResponseDTO response = new TrainingResponseDTO();
-//        response.setContent(dtoList);
-//        response.setPageNumber(page.getNumber());
-//        response.setTotalPages(page.getTotalPages());
-//        response.setTotalElements(page.getTotalElements());
-//
-//        return response;    }
-
-    //nahrazení metody výše
     @GetMapping({"api/loadAllTrainings/", "api/loadAllTrainings"})
     public List<TrainingResponseDTO> getTrainingsForCalendar(
 

@@ -4,7 +4,7 @@ import com.matejmarek.ragnarok_customers_reservation_system.dto.ReservationDTO;
 import com.matejmarek.ragnarok_customers_reservation_system.dto.TrainingDTO;
 import com.matejmarek.ragnarok_customers_reservation_system.dto.TrainingResponseDTO;
 import com.matejmarek.ragnarok_customers_reservation_system.dto.mapper.ReservationMapper;
-import com.matejmarek.ragnarok_customers_reservation_system.dto.mapper.TrainingMapperImpl;
+import com.matejmarek.ragnarok_customers_reservation_system.dto.mapper.TrainingMapper;
 import com.matejmarek.ragnarok_customers_reservation_system.entity.TrainingEntity;
 import com.matejmarek.ragnarok_customers_reservation_system.entity.repository.TrainingRepository;
 import jakarta.persistence.EntityNotFoundException;
@@ -12,60 +12,99 @@ import jakarta.transaction.Transactional;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
-import java.util.HashMap;
-import java.util.Map;
-import java.util.Optional;
+import java.util.*;
 import java.util.stream.Collectors;
 
 import java.time.LocalDateTime;
-import java.util.List;
 
 @Service
 public class TrainingServiceImpl implements TrainingService {
 
     @Autowired
     TrainingRepository trainingRepository;
-    @Autowired
-    TrainingMapperImpl trainingMapper;
+
     @Autowired
     ReservationMapper reservationMapper;
 
+    @Autowired
+    TrainingMapper trainingMapper;
+
 
     // Create new training and repeat in an interval (interval is 7 days - so repeating the chosen training lesson next week).
+//    @Override
+//    @Transactional
+//    public TrainingDTO createTraining(TrainingDTO trainingDTO) {
+//
+//        TrainingEntity dtoToEntity = trainingMapper.toEntity(trainingDTO);
+//        TrainingEntity savedEntity = trainingRepository.save(dtoToEntity);
+//
+//        // Admin set the number of copies higher than 1.
+//        if (trainingDTO.getNumberOfCopyConcreteTraining() > 1) {
+//            createRepeatedLessons(trainingDTO, trainingDTO.getRepeatIntervalInDays(), savedEntity.getTrainingId());
+//        }
+//
+//        System.out.println("Trénink uložen: " + trainingDTO + ". Zároveň bylo vytvořeno " + trainingDTO.getNumberOfCopyConcreteTraining() + " kopií vzájemně vzdálených " + trainingDTO.getRepeatIntervalInDays() + " dnů.");
+//
+//        return trainingDTO;
+//    }
+
     @Override
     @Transactional
     public TrainingDTO createTraining(TrainingDTO trainingDTO) {
+        // Ruční vytvoření nové entitní instance
+        TrainingEntity trainingEntity = new TrainingEntity();
 
-        TrainingEntity dtoToEntity = trainingMapper.toEntity(trainingDTO);
-        TrainingEntity savedEntity = trainingRepository.save(dtoToEntity);
+        trainingEntity.setNameOfLesson(trainingDTO.getNameOfLesson());
+        trainingEntity.setNumberOfFreeSlots(trainingDTO.getNumberOfFreeSlots());
+        trainingEntity.setDateOfCurrentLesson(trainingDTO.getDateOfCurrentLesson());
+        trainingEntity.setStartOfCurrentLesson(trainingDTO.getStartOfCurrentLesson());
+        trainingEntity.setEndOfCurrentLesson(trainingDTO.getEndOfCurrentLesson());
+        trainingEntity.setRepeatIntervalInDays(trainingDTO.getRepeatIntervalInDays());
+        trainingEntity.setCoachName(trainingDTO.getCoachName());
+        trainingEntity.setNumberOfCopyConcreteTraining(trainingDTO.getNumberOfCopyConcreteTraining());
 
-        // Admin set the number of copies higher than 1.
+        // ParentId se nenastavuje při první instanci
+        trainingEntity.setParentTrainingId(null);
+
+        TrainingEntity savedEntity = trainingRepository.save(trainingEntity);
+        Long parentId = savedEntity.getTrainingId();
+
+        // Vytvoření kopií pokud je počet větší než 1
         if (trainingDTO.getNumberOfCopyConcreteTraining() > 1) {
-            createRepeatedLessons(trainingDTO, trainingDTO.getRepeatIntervalInDays());
+            createRepeatedLessons(trainingDTO, trainingDTO.getRepeatIntervalInDays(), parentId);
         }
 
         System.out.println("Trénink uložen: " + trainingDTO + ". Zároveň bylo vytvořeno " + trainingDTO.getNumberOfCopyConcreteTraining() + " kopií vzájemně vzdálených " + trainingDTO.getRepeatIntervalInDays() + " dnů.");
 
-        return trainingDTO;
+        return trainingMapper.toDTO(savedEntity); // Volitelně: můžeš i ručně vytvořit TrainingDTO pokud mapper blbne
     }
 
     // Repeat lessons method.
-    private void createRepeatedLessons(TrainingDTO modelLesson, int repeatIntervalInDays) {
+    private void createRepeatedLessons(TrainingDTO modelLesson, int repeatIntervalInDays, Long parentId) {
         LocalDateTime nextDate = modelLesson.getDateOfCurrentLesson().plusDays(repeatIntervalInDays);
-        int remainNumberOfCopy = modelLesson.getNumberOfCopyConcreteTraining()-1;
-        for (int i = 0; i < modelLesson.getNumberOfCopyConcreteTraining(); i++) {
-            TrainingDTO repeatedLesson = new TrainingDTO();
-            repeatedLesson.setNameOfLesson(modelLesson.getNameOfLesson());
-            repeatedLesson.setNumberOfFreeSlots(modelLesson.getNumberOfFreeSlots());
-            repeatedLesson.setDateOfCurrentLesson(nextDate);
-            repeatedLesson.setStartOfCurrentLesson(nextDate);
-            repeatedLesson.setEndOfCurrentLesson(nextDate.plusHours(modelLesson.getEndOfCurrentLesson().getHour() - modelLesson.getStartOfCurrentLesson().getHour() + 1));
-            repeatedLesson.setRepeatIntervalInDays(repeatIntervalInDays);
-            repeatedLesson.setCoachName(modelLesson.getCoachName());
-            repeatedLesson.setNumberOfCopyConcreteTraining(remainNumberOfCopy);
+        int remainNumberOfCopy = modelLesson.getNumberOfCopyConcreteTraining() - 1;
 
-            TrainingEntity repeatedDtoToEntity = trainingMapper.toEntity(repeatedLesson);
-            TrainingEntity savedRepeatedEntity = trainingRepository.save(repeatedDtoToEntity);
+        for (int i = 1; i < modelLesson.getNumberOfCopyConcreteTraining(); i++) {
+            TrainingEntity repeatedEntity = new TrainingEntity();
+
+            repeatedEntity.setNameOfLesson(modelLesson.getNameOfLesson());
+            repeatedEntity.setNumberOfFreeSlots(modelLesson.getNumberOfFreeSlots());
+
+            repeatedEntity.setDateOfCurrentLesson(nextDate);
+            repeatedEntity.setStartOfCurrentLesson(nextDate);
+            repeatedEntity.setEndOfCurrentLesson(
+                    nextDate.plusHours(
+                            modelLesson.getEndOfCurrentLesson().getHour() - modelLesson.getStartOfCurrentLesson().getHour() + 1
+                    )
+            );
+
+            repeatedEntity.setRepeatIntervalInDays(repeatIntervalInDays);
+            repeatedEntity.setCoachName(modelLesson.getCoachName());
+
+            repeatedEntity.setNumberOfCopyConcreteTraining(remainNumberOfCopy);
+            repeatedEntity.setParentTrainingId(parentId);
+
+            trainingRepository.save(repeatedEntity);
 
             nextDate = nextDate.plusDays(repeatIntervalInDays);
             remainNumberOfCopy--;
@@ -102,7 +141,7 @@ public class TrainingServiceImpl implements TrainingService {
             for (ReservationDTO reservationDTO : reservationDTOs) {
                 int checkingNumberOfReservations = reservationDTO.getNumberOfBookedEntries();
                 if (checkingNumberOfReservations > 1) {
-                    extraReservations += reservationDTO.getNumberOfBookedEntries()-1;
+                    extraReservations += reservationDTO.getNumberOfBookedEntries() - 1;
                 }
             }
 
@@ -158,24 +197,22 @@ public class TrainingServiceImpl implements TrainingService {
     @Transactional
     @Override
     public void removeAllPlannedTrainings(Long trainingId) {
-        // Najdi výchozí trénink podle ID
-        TrainingEntity trainingEntity = trainingRepository.findById(trainingId)
-                .orElseThrow(() -> new EntityNotFoundException("Trénink podle zadaného ID " + trainingId + " nenalezen."));
+        TrainingEntity clickedTraining = trainingRepository.findById(trainingId)
+                .orElseThrow(() -> new EntityNotFoundException("Trénink nenalezen."));
 
-        // Získání údajů z tréninku pro identifikaci opakujících se lekcí
-        String nameOfLesson = trainingEntity.getNameOfLesson();
-        LocalDateTime startOfCurrentLesson = trainingEntity.getStartOfCurrentLesson();
+        Long parentTrainingId = clickedTraining.getParentTrainingId() != null
+                ? clickedTraining.getParentTrainingId()
+                : clickedTraining.getTrainingId(); // Pokud klikneme na originál, použijeme jeho ID
 
-        // Mazání všech tréninků od daného data včetně, které splňují podmínky (shodný název, stejný čas, opakování po týdnu)
-        List<TrainingEntity> plannedTrainings = trainingRepository.findAllByNameOfLessonAndStartOfCurrentLesson(
-                nameOfLesson, startOfCurrentLesson.plusDays(7));  // stejný název, stejný čas začátku, o týden později
+        LocalDateTime startOfCurrentLesson = clickedTraining.getStartOfCurrentLesson();
 
-        for (TrainingEntity training : plannedTrainings) {
-            trainingRepository.delete(training);
-            System.out.println("Trénink ID: " + training.getTrainingId() + " a jeho rezervace byly vymazány.");
-        }
+        List<TrainingEntity> toDelete = trainingRepository
+                .findByParentTrainingIdAndStartOfCurrentLessonGreaterThanEqual(parentTrainingId, startOfCurrentLesson);
 
-        trainingRepository.delete(trainingEntity);
+        trainingRepository.deleteAll(toDelete);
+
+        // Smaž i právě kliknutý trénink
+        trainingRepository.delete(clickedTraining);
     }
 
     //edit - one training
@@ -185,110 +222,229 @@ public class TrainingServiceImpl implements TrainingService {
         TrainingEntity trainingEntity = trainingRepository.findById(trainingId)
                 .orElseThrow(() -> new EntityNotFoundException("Trénink podle zadaného ID " + trainingId + " nenalezen."));
 
-        // Přepsání hodnot na základě DTO, zbytek hodnot z databáze (např. seznam rezervací) nedotčených
-        trainingEntity.setTrainingId(trainingId);
+        boolean hasChanged = !Objects.equals(trainingEntity.getNameOfLesson(), trainingDTO.getNameOfLesson()) ||
+                !Objects.equals(trainingEntity.getStartOfCurrentLesson(), trainingDTO.getStartOfCurrentLesson()) ||
+                !Objects.equals(trainingEntity.getEndOfCurrentLesson(), trainingDTO.getEndOfCurrentLesson());
+
+        if (hasChanged) {
+            trainingEntity.setParentTrainingId(null);
+        }
+
         trainingEntity.setNameOfLesson(trainingDTO.getNameOfLesson());
         trainingEntity.setNumberOfFreeSlots(trainingDTO.getNumberOfFreeSlots());
-        trainingEntity.setDateOfCurrentLesson(trainingDTO.getStartOfCurrentLesson());
+        trainingEntity.setDateOfCurrentLesson(trainingDTO.getDateOfCurrentLesson());
         trainingEntity.setStartOfCurrentLesson(trainingDTO.getStartOfCurrentLesson());
         trainingEntity.setEndOfCurrentLesson(trainingDTO.getEndOfCurrentLesson());
         trainingEntity.setRepeatIntervalInDays(trainingDTO.getRepeatIntervalInDays());
         trainingEntity.setCoachName(trainingDTO.getCoachName());
         trainingEntity.setNumberOfCopyConcreteTraining(trainingDTO.getNumberOfCopyConcreteTraining());
 
-        // Uložení změněného tréninku zpět do DB
         trainingRepository.save(trainingEntity);
-
         return trainingMapper.toDTO(trainingEntity);
     }
 
 
     //edit - all next's trainings
-//    @Transactional
-//    @Override
-//    public void editAllPlannedTrainings(Long trainingId, TrainingDTO trainingDTO) {
-//        // Získání zadaného tréninku
-//        TrainingEntity initialTraining = trainingRepository.findById(trainingId)
-//                .orElseThrow(() -> new EntityNotFoundException("Trénink podle zadaného ID " + trainingId + " nenalezen."));
-//
-//        // Nalezení všech následujících tréninků, které mají stejný název a čas
-//        List<TrainingEntity> trainingsToEdit = trainingRepository.findAllByNameOfLessonAndStartOfCurrentLesson(
-//                initialTraining.getNameOfLesson(),
-//                initialTraining.getStartOfCurrentLesson().plusDays(7)
-//        );
-//
-//        // Pro každý z nalezených tréninků aktualizujeme hodnoty na základě DTO
-//        for (TrainingEntity training : trainingsToEdit) {
-//            training.setNameOfLesson(trainingDTO.getNameOfLesson());
-//            training.setNumberOfFreeSlots(trainingDTO.getNumberOfFreeSlots());
-//            training.setDateOfCurrentLesson(trainingDTO.getDateOfCurrentLesson());
-//            training.setStartOfCurrentLesson(trainingDTO.getStartOfCurrentLesson());
-//            training.setEndOfCurrentLesson(trainingDTO.getEndOfCurrentLesson());
-//            training.setCoachName(trainingDTO.getCoachName());
-//
-//
-//            // Uložení upraveného tréninku
-//            trainingRepository.save(training);
-//        }
-//        trainingRepository.save(initialTraining);
-//    }
     @Transactional
     @Override
     public void editAllPlannedTrainings(Long trainingId, TrainingDTO trainingDTO) {
-        TrainingEntity initialTraining = trainingRepository.findById(trainingId)
+        TrainingEntity clickedTraining = trainingRepository.findById(trainingId)
                 .orElseThrow(() -> new EntityNotFoundException("Trénink nenalezen."));
 
-        int repeatInterval = trainingDTO.getRepeatIntervalInDays(); // 7
-        int numberOfRepeats = trainingDTO.getNumberOfCopyConcreteTraining(); // kolik se má iterovat
+        Long parentTrainingId = clickedTraining.getParentTrainingId() != null
+                ? clickedTraining.getParentTrainingId()
+                : clickedTraining.getTrainingId();
 
-        LocalDateTime originalStart = initialTraining.getStartOfCurrentLesson();
-        LocalDateTime originalEnd = initialTraining.getEndOfCurrentLesson();
-        LocalDateTime originalDate = initialTraining.getDateOfCurrentLesson();
+        LocalDateTime startFrom = clickedTraining.getStartOfCurrentLesson();
+        List<TrainingEntity> toEdit = trainingRepository
+                .findByParentTrainingIdAndStartOfCurrentLessonGreaterThanEqual(parentTrainingId, startFrom);
 
-        // Vycházíme z nových hodnot, které uživatel zadal
-        LocalDateTime newStart = trainingDTO.getStartOfCurrentLesson();
-        LocalDateTime newEnd = trainingDTO.getEndOfCurrentLesson();
-        LocalDateTime newDate = trainingDTO.getDateOfCurrentLesson();
+        int interval = trainingDTO.getRepeatIntervalInDays();
 
-        for (int i = 1; i <= numberOfRepeats; i++) {
-            LocalDateTime startToFind = originalStart.plusDays(i * repeatInterval);
+        boolean hasChanged = !Objects.equals(clickedTraining.getNameOfLesson(), trainingDTO.getNameOfLesson()) ||
+                !Objects.equals(clickedTraining.getStartOfCurrentLesson(), trainingDTO.getStartOfCurrentLesson()) ||
+                !Objects.equals(clickedTraining.getEndOfCurrentLesson(), trainingDTO.getEndOfCurrentLesson());
 
-            List<TrainingEntity> trainings = trainingRepository
-                    .findByNameOfLessonAndStartOfCurrentLesson(initialTraining.getNameOfLesson(), startToFind);
+        if (hasChanged) {
+            clickedTraining.setParentTrainingId(null);
+            trainingRepository.save(clickedTraining);
 
-            if (!trainings.isEmpty()) {
-                // Očekáváme pouze jeden trénink v seznamu
-                TrainingEntity training = trainings.get(0);
+            for (int i = 0; i < toEdit.size(); i++) {
+                TrainingEntity training = toEdit.get(i);
+                training.setParentTrainingId(clickedTraining.getTrainingId());
 
                 training.setNameOfLesson(trainingDTO.getNameOfLesson());
                 training.setCoachName(trainingDTO.getCoachName());
                 training.setNumberOfFreeSlots(trainingDTO.getNumberOfFreeSlots());
 
-                // Posun data podle i-tého týdne vůči novému základu
-                training.setStartOfCurrentLesson(newStart.plusDays(i * repeatInterval));
-                training.setEndOfCurrentLesson(newEnd.plusDays(i * repeatInterval));
-                training.setDateOfCurrentLesson(newDate.plusDays(i * repeatInterval));
+                training.setStartOfCurrentLesson(trainingDTO.getStartOfCurrentLesson().plusDays((i + 1) * interval));
+                training.setEndOfCurrentLesson(trainingDTO.getEndOfCurrentLesson().plusDays((i + 1) * interval));
+                training.setDateOfCurrentLesson(trainingDTO.getDateOfCurrentLesson().plusDays((i + 1) * interval));
 
                 trainingRepository.save(training);
-            } else {
-                System.out.println("Upozornění: Trénink pro týden " + i + " nebyl nalezen.");
+            }
+        } else {
+            for (int i = 0; i < toEdit.size(); i++) {
+                TrainingEntity training = toEdit.get(i);
+
+                training.setNameOfLesson(trainingDTO.getNameOfLesson());
+                training.setCoachName(trainingDTO.getCoachName());
+                training.setNumberOfFreeSlots(trainingDTO.getNumberOfFreeSlots());
+
+                training.setStartOfCurrentLesson(trainingDTO.getStartOfCurrentLesson().plusDays((i + 1) * interval));
+                training.setEndOfCurrentLesson(trainingDTO.getEndOfCurrentLesson().plusDays((i + 1) * interval));
+                training.setDateOfCurrentLesson(trainingDTO.getDateOfCurrentLesson().plusDays((i + 1) * interval));
+
+                trainingRepository.save(training);
             }
         }
 
-        // Uložíme i první trénink (aktuálně upravený)
-        initialTraining.setNameOfLesson(trainingDTO.getNameOfLesson());
-        initialTraining.setCoachName(trainingDTO.getCoachName());
-        initialTraining.setNumberOfFreeSlots(trainingDTO.getNumberOfFreeSlots());
-        initialTraining.setStartOfCurrentLesson(newStart);
-        initialTraining.setEndOfCurrentLesson(newEnd);
-        initialTraining.setDateOfCurrentLesson(newDate);
+        clickedTraining.setNameOfLesson(trainingDTO.getNameOfLesson());
+        clickedTraining.setCoachName(trainingDTO.getCoachName());
+        clickedTraining.setNumberOfFreeSlots(trainingDTO.getNumberOfFreeSlots());
+        clickedTraining.setStartOfCurrentLesson(trainingDTO.getStartOfCurrentLesson());
+        clickedTraining.setEndOfCurrentLesson(trainingDTO.getEndOfCurrentLesson());
+        clickedTraining.setDateOfCurrentLesson(trainingDTO.getDateOfCurrentLesson());
 
-        trainingRepository.save(initialTraining);
+        trainingRepository.save(clickedTraining);
     }
-
-
-
-
 }
+//    @Transactional
+//    @Override
+//    public void editAllPlannedTrainings(Long trainingId, TrainingDTO trainingDTO) {
+//        TrainingEntity clickedTraining = trainingRepository.findById(trainingId)
+//                .orElseThrow(() -> new EntityNotFoundException("Trénink nenalezen."));
+//
+//        Long parentTrainingId = clickedTraining.getParentTrainingId() != null
+//                ? clickedTraining.getParentTrainingId()
+//                : clickedTraining.getTrainingId();
+//
+//        LocalDateTime startFrom = clickedTraining.getStartOfCurrentLesson();
+//
+//        List<TrainingEntity> toEdit = trainingRepository
+//                .findByParentTrainingIdAndStartOfCurrentLessonGreaterThanEqual(parentTrainingId, startFrom);
+//
+//        int interval = trainingDTO.getRepeatIntervalInDays();
+//
+//        for (int i = 0; i < toEdit.size(); i++) {
+//            TrainingEntity training = toEdit.get(i);
+//
+//            training.setNameOfLesson(trainingDTO.getNameOfLesson());
+//            training.setCoachName(trainingDTO.getCoachName());
+//            training.setNumberOfFreeSlots(trainingDTO.getNumberOfFreeSlots());
+//
+//            training.setStartOfCurrentLesson(trainingDTO.getStartOfCurrentLesson().plusDays(i * interval));
+//            training.setEndOfCurrentLesson(trainingDTO.getEndOfCurrentLesson().plusDays(i * interval));
+//            training.setDateOfCurrentLesson(trainingDTO.getDateOfCurrentLesson().plusDays(i * interval));
+//
+//            trainingRepository.save(training);
+//        }
+//
+//        // Upravíme i kliknutý trénink (první v sérii)
+//        clickedTraining.setNameOfLesson(trainingDTO.getNameOfLesson());
+//        clickedTraining.setCoachName(trainingDTO.getCoachName());
+//        clickedTraining.setNumberOfFreeSlots(trainingDTO.getNumberOfFreeSlots());
+//        clickedTraining.setStartOfCurrentLesson(trainingDTO.getStartOfCurrentLesson());
+//        clickedTraining.setEndOfCurrentLesson(trainingDTO.getEndOfCurrentLesson());
+//        clickedTraining.setDateOfCurrentLesson(trainingDTO.getDateOfCurrentLesson());
+//
+//        trainingRepository.save(clickedTraining);
+//    }
+//}
+//    @Transactional
+//    @Override
+//    public void editAllPlannedTrainings(Long trainingId, TrainingDTO trainingDTO) {
+//        TrainingEntity initialTraining = trainingRepository.findById(trainingId)
+//                .orElseThrow(() -> new EntityNotFoundException("Trénink podle zadaného ID " + trainingId + " nenalezen."));
+//
+//        String nameOfLesson = initialTraining.getNameOfLesson();
+//        LocalDateTime startOfCurrentLesson = initialTraining.getStartOfCurrentLesson();
+//
+//        List<TrainingEntity> plannedTrainings = trainingRepository.findAllByNameOfLessonAndStartOfCurrentLesson(
+//                nameOfLesson, startOfCurrentLesson.plusDays(7));
+//
+//        for (int i = 0; i < plannedTrainings.size(); i++) {
+//            TrainingEntity trainingEntity = plannedTrainings.get(i);
+//
+//            trainingEntity.setNameOfLesson(trainingDTO.getNameOfLesson());
+//            trainingEntity.setNumberOfFreeSlots(trainingDTO.getNumberOfFreeSlots());
+//            trainingEntity.setDateOfCurrentLesson(trainingDTO.getDateOfCurrentLesson().plusDays(trainingDTO.getRepeatIntervalInDays() * i));
+//            trainingEntity.setStartOfCurrentLesson(trainingDTO.getStartOfCurrentLesson().plusDays(trainingDTO.getRepeatIntervalInDays() * i));
+//            trainingEntity.setEndOfCurrentLesson(trainingDTO.getEndOfCurrentLesson().plusDays(trainingDTO.getRepeatIntervalInDays() * i));
+//            trainingEntity.setCoachName(trainingDTO.getCoachName());
+//
+//            trainingRepository.save(trainingEntity);
+//        }
+//
+//        // Uložení prvního (upraveného) tréninku
+//        initialTraining.setNameOfLesson(trainingDTO.getNameOfLesson());
+//        initialTraining.setNumberOfFreeSlots(trainingDTO.getNumberOfFreeSlots());
+//        initialTraining.setDateOfCurrentLesson(trainingDTO.getDateOfCurrentLesson());
+//        initialTraining.setStartOfCurrentLesson(trainingDTO.getStartOfCurrentLesson());
+//        initialTraining.setEndOfCurrentLesson(trainingDTO.getEndOfCurrentLesson());
+//        initialTraining.setCoachName(trainingDTO.getCoachName());
+//
+//        trainingRepository.save(initialTraining);
+//    }
+//}
+
+
+
+//    @Transactional
+//    @Override
+//    public void editAllPlannedTrainings(Long trainingId, TrainingDTO trainingDTO) {
+//        TrainingEntity initialTraining = trainingRepository.findById(trainingId)
+//                .orElseThrow(() -> new EntityNotFoundException("Trénink nenalezen."));
+//
+//        int repeatInterval = trainingDTO.getRepeatIntervalInDays(); // 7
+//        int numberOfRepeats = trainingDTO.getNumberOfCopyConcreteTraining(); // kolik se má iterovat
+//
+//        LocalDateTime originalStart = initialTraining.getStartOfCurrentLesson();
+//
+//        // Vycházíme z nových hodnot, které uživatel zadal
+//        LocalDateTime newStart = trainingDTO.getStartOfCurrentLesson();
+//        LocalDateTime newEnd = trainingDTO.getEndOfCurrentLesson();
+//        LocalDateTime newDate = trainingDTO.getDateOfCurrentLesson();
+//
+//        for (int i = 1; i <= numberOfRepeats; i++) {
+//            LocalDateTime startToFind = originalStart.plusDays(i * repeatInterval);
+//
+//            Optional<TrainingEntity> optionalTraining = trainingRepository
+//                    .findByNameOfLessonAndStartOfCurrentLesson(initialTraining.getNameOfLesson(), startToFind);
+//
+//            if (optionalTraining.isPresent()) {
+//                TrainingEntity training = optionalTraining.get();
+//
+//                training.setNameOfLesson(trainingDTO.getNameOfLesson());
+//                training.setCoachName(trainingDTO.getCoachName());
+//                training.setNumberOfFreeSlots(trainingDTO.getNumberOfFreeSlots());
+//
+//                // Posun data podle i-tého týdne vůči novému základu
+//                training.setStartOfCurrentLesson(newStart.plusDays(i * repeatInterval));
+//                training.setEndOfCurrentLesson(newEnd.plusDays(i * repeatInterval));
+//                training.setDateOfCurrentLesson(newDate.plusDays(i * repeatInterval));
+//
+//                trainingRepository.save(training);
+//            } else {
+//                System.out.println("Upozornění: Trénink pro týden " + i + " nebyl nalezen.");
+//            }
+//        }
+//
+//        // Uložíme i první trénink (aktuálně upravený)
+//        initialTraining.setNameOfLesson(trainingDTO.getNameOfLesson());
+//        initialTraining.setCoachName(trainingDTO.getCoachName());
+//        initialTraining.setNumberOfFreeSlots(trainingDTO.getNumberOfFreeSlots());
+//        initialTraining.setStartOfCurrentLesson(newStart);
+//        initialTraining.setEndOfCurrentLesson(newEnd);
+//        initialTraining.setDateOfCurrentLesson(newStart);
+//
+//        trainingRepository.save(initialTraining);
+//    }
+//}
+
+
+
+
+
 
 

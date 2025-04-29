@@ -34,24 +34,6 @@ public class AdminController {
 
     ////////////////////////////////////////////////////////////////////////////////////////
 
-    //Pro ostrý provoz - nefunguje pro testování skrz POSTMAN
-//    @PostMapping("/api/loginAdmin")
-//    public void loginAdmin(@RequestBody @Valid AdminDTO adminDTO,
-//                           HttpServletRequest request,
-//                           HttpServletResponse response) throws IOException {
-//        try {
-//            request.login(adminDTO.getAdminEmail(), adminDTO.getPassword());
-//
-//            // přesměrování na stránku po přihlášení
-//            adminService.loginAdmin(adminDTO, request, response);
-//
-//        } catch (ServletException e) {
-//            response.sendError(HttpServletResponse.SC_UNAUTHORIZED, "Přihlášení selhalo");
-//        }
-//    }
-
-    //Alternativa pro testování skrz postmana
-    //Tested by postman - OK
     @PostMapping("/api/loginAdmin")
     public ResponseEntity<?> loginAdmin(@RequestBody AdminDTO adminDTO, HttpServletRequest request) {
         try {
@@ -66,27 +48,12 @@ public class AdminController {
 
     ////////////////////////////////////////////////////////////////////////////////////////
 
-    //Varianta pro ostrý provoz
+    // Aktuálně přihlášený uživatel?
     @GetMapping("/api/whoami")
     public ResponseEntity<AdminDTO> whoAmI(HttpServletRequest request) {
         return adminService.getCurrentAdminInfo(request);
     }
 
-    //Varianta pro testování Postmanem
-//    @GetMapping("/api/whoami")
-//    public ResponseEntity<?> whoAmI(HttpServletRequest request) {
-//        Principal principal = request.getUserPrincipal();
-//
-//        if (principal instanceof AdminEntity admin) {
-//            AdminDTO dto = new AdminDTO();
-//            dto.setAdminEmail(admin.getAdminEmail());
-//            dto.setAdminId(admin.getAdminId());
-//            dto.setAdmin(admin.isAdmin());
-//            return ResponseEntity.ok(dto);
-//        }
-//
-//        return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body("Uživatel není přihlášen");
-//    }
 
 
     ////////////////////////////////////////////////////////////////////////////////////////

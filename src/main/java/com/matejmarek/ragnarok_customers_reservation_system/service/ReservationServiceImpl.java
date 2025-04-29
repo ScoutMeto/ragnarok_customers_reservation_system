@@ -3,7 +3,7 @@ package com.matejmarek.ragnarok_customers_reservation_system.service;
 import com.matejmarek.ragnarok_customers_reservation_system.dto.ReservationDTO;
 import com.matejmarek.ragnarok_customers_reservation_system.dto.TrainingDTO;
 import com.matejmarek.ragnarok_customers_reservation_system.dto.mapper.ReservationMapper;
-import com.matejmarek.ragnarok_customers_reservation_system.dto.mapper.TrainingMapperImpl;
+import com.matejmarek.ragnarok_customers_reservation_system.dto.mapper.TrainingMapper;
 import com.matejmarek.ragnarok_customers_reservation_system.entity.ReservationEntity;
 import com.matejmarek.ragnarok_customers_reservation_system.entity.TrainingEntity;
 import com.matejmarek.ragnarok_customers_reservation_system.entity.repository.ReservationRepository;
@@ -20,42 +20,29 @@ public class ReservationServiceImpl implements ReservationService {
     ReservationRepository reservationRepository;
 
     @Autowired
+    TrainingMapper trainingMapper;
+
+    @Autowired
     ReservationMapper reservationMapper;
     @Autowired
     TrainingService trainingService;
     @Autowired
-    TrainingMapperImpl trainingMapper;
-    @Autowired
     TrainingRepository trainingRepository;
 
-//    @Override
-//    @Transactional
-//    public ReservationDTO createReservation (ReservationDTO reservationDTO) {
-//
-//        TrainingDTO trainingDTO = trainingService.getOneTrainingById(reservationDTO.getTrainingId());
-//
-//        reservationDTO.setTraining(trainingMapper.toEntity(trainingDTO));
-//
-//        ReservationEntity dtoToEntity = reservationMapper.toEntity(reservationDTO);
-//        ReservationEntity savedEntity = reservationRepository.save(dtoToEntity);
-//
-//        System.out.println("Rezervace uložena: " + reservationDTO);
-//        return reservationDTO;
-//    }
-@Override
-@Transactional
-public ReservationDTO createReservation(ReservationDTO reservationDTO) {
-    TrainingEntity trainingEntity = trainingRepository.findById(reservationDTO.getTrainingId())
-            .orElseThrow(() -> new EntityNotFoundException("Trénink s ID " + reservationDTO.getTrainingId() + " nenalezen."));
+    @Override
+    @Transactional
+    public ReservationDTO createReservation(ReservationDTO reservationDTO) {
+        TrainingEntity trainingEntity = trainingRepository.findById(reservationDTO.getTrainingId())
+                .orElseThrow(() -> new EntityNotFoundException("Trénink s ID " + reservationDTO.getTrainingId() + " nenalezen."));
 
-    ReservationEntity reservationEntity = reservationMapper.toEntity(reservationDTO);
-    reservationEntity.setTraining(trainingEntity); // správné přiřazení
+        ReservationEntity reservationEntity = reservationMapper.toEntity(reservationDTO);
+        reservationEntity.setTraining(trainingEntity); // správné přiřazení
 
-    reservationRepository.save(reservationEntity);
+        reservationRepository.save(reservationEntity);
 
-    System.out.println("Rezervace uložena: " + reservationDTO);
-    return reservationDTO;
-}
+        System.out.println("Rezervace uložena: " + reservationDTO);
+        return reservationDTO;
+    }
 
     @Override
     @Transactional
@@ -80,14 +67,30 @@ public ReservationDTO createReservation(ReservationDTO reservationDTO) {
     }
 
     @Override
-    @Transactional
     public void deleteReservation(Long reservationId) {
-        // Najdeme rezervaci podle ID
-        ReservationEntity existingReservation = reservationRepository.findById(reservationId)
-                .orElseThrow(() -> new EntityNotFoundException("Rezervace s ID " + reservationId + " nenalezena."));
-
-        // Smažeme rezervaci
-        reservationRepository.delete(existingReservation);
-        System.out.println("Rezervace s ID " + reservationId + " byla úspěšně odstraněna.");
+        int removed = reservationRepository.deleteByReservationIdJPQL(reservationId);
+        if (removed == 0) {
+            throw new EntityNotFoundException("Rezervace s ID " + reservationId + " nenalezena.");
+        }
     }
+//    @Override
+//    @Transactional
+//    public void deleteReservation(Long reservationId) {
+//        // Najdeme rezervaci podle ID
+//        ReservationEntity existingReservation = reservationRepository.findById(reservationId)
+//                .orElseThrow(() -> new EntityNotFoundException("Rezervace s ID " + reservationId + " nenalezena."));
+//
+//        // Smažeme rezervaci
+//        reservationRepository.deleteById(reservationId);
+//        System.out.println("Rezervace s ID " + existingReservation.getReservationId() + " byla úspěšně odstraněna.");
+//    }
+
+    //Chatem doporučený vzhled metody "delete"
+//    public void deleteReservation(Long reservationId) {
+//        if (!reservationRepository.existsById(reservationId)) {
+//            throw new EntityNotFoundException("Rezervace s ID " + reservationId + " nenalezena.");
+//        }
+//        reservationRepository.deleteById(reservationId);
+//        reservationRepository.flush();
+//    }
 }

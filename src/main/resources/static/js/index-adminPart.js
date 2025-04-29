@@ -10,6 +10,7 @@ document.addEventListener("DOMContentLoaded", function () {
         return 'dayGridMonth';                        // velká obrazovka
     }
 
+    let editMode = "single"; // nebo "series"
 
     // načtení kalendáře
     const calendarEl = document.getElementById('calendar')
@@ -56,6 +57,13 @@ document.addEventListener("DOMContentLoaded", function () {
                 const props = event.extendedProps;
                 // Uložíme trainingId do globální proměnné pro pozdější použití
                 window.selectedTrainingId = props.trainingId;
+                window.selectedTrainingData  = {
+                lessonName: props.lessonName,
+                coachName: props.coachName,
+                start: info.event.start,
+                end: info.event.end,
+                capacity: props.numberOfFreeSlots
+                };
 
                 document.getElementById('modal-title').textContent = event.title || "Neznámý název";
                 document.getElementById('modal-coach').textContent = props.coachName || "neuvedeno";
@@ -83,10 +91,39 @@ document.addEventListener("DOMContentLoaded", function () {
                 li.textContent = `${res.firstName} ${res.secondName}, ${res.userEmail}, ${res.telephoneNumber}, ${res.numberOfBookedEntries} (počet osob)`;
                 li.style.cursor = "pointer";
                 li.addEventListener("click", () => {
-                    if (confirm("Upravit nebo smazat rezervaci?")) {
-                        // TODO: Otevři modal s úpravou nebo potvrzením smazání
-                        alert(`TODO: Implementace úpravy nebo mazání rezervace ID: ${res.reservationId}`);
-                    }
+                    window.selectedReservationId = res.reservation_id; // <<< TADY uložíš ID rezervace globálně - přístupné dál pro další metody, které ho potřebují
+                    window.selectedReservationData = res;             // Uložíme celý objekt rezervace
+
+                    console.log("Vybrané ID rezervace:", window.selectedReservationId);
+
+                    // Otevřeme vlastní modal s volbou
+                    document.getElementById('reservationOptionsModal').style.display = 'block';
+
+                    // if (confirm("Upravit nebo smazat rezervaci?")) {
+                    //     // Otevřít modální okno s předvyplněnými daty
+                    //     document.getElementById('editReservationId').value = selectedReservationId;
+                    //     document.getElementById('editFirstName').value = res.firstName;
+                    //     document.getElementById('editSecondName').value = res.secondName;
+                    //     document.getElementById('editEmail').value = res.userEmail;
+                    //     document.getElementById('editPhone').value = res.telephoneNumber;
+                    //     document.getElementById('editPeople').value = res.numberOfBookedEntries;
+                    //
+                    //     document.getElementById('reservationEditModal').style.display = 'block';
+                    // } else if (confirm("Chcete smazat tuto rezervaci?")) {
+                    //     if (confirm("Opravdu chcete smazat rezervaci?")) {
+                    //         fetch(`/api/deleteReservation/${selectedReservationId}`, {
+                    //             method: 'DELETE'
+                    //         })
+                    //             .then(response => {
+                    //                 if (response.ok) {
+                    //                     alert('Rezervace smazána');
+                    //                     calendar.refetchEvents();
+                    //                 } else {
+                    //                     alert('Chyba při mazání rezervace');
+                    //                 }
+                    //             });
+                    //     }
+                    // }
                 });
                 listContainer.appendChild(li);
             });
@@ -113,18 +150,6 @@ document.addEventListener("DOMContentLoaded", function () {
             endInput.value = defaultEnd.toISOString().slice(0, 16);
         }
     })
-
-    // Funkce pro otevření modalu pro úpravu rezervace
-    function openReservationEditModal(reservation) {
-        document.getElementById('editReservationId').value = reservation.reservationId;
-        document.getElementById('editFirstName').value = reservation.firstName;
-        document.getElementById('editSecondName').value = reservation.secondName;
-        document.getElementById('editEmail').value = reservation.userEmail;
-        document.getElementById('editPhone').value = reservation.telephoneNumber;
-        document.getElementById('editPeople').value = reservation.numberOfBookedEntries;
-
-        document.getElementById('reservationEditModal').style.display = 'block';
-    }
 
 
 
@@ -157,6 +182,18 @@ document.addEventListener("DOMContentLoaded", function () {
         document.getElementById('editTrainingModal').style.display = 'none';
     };
 
+    // Zavření modálního okna pro funkci "editReservation"
+    document.querySelector('.close-options-modal').addEventListener('click', function() {
+        document.getElementById('reservationOptionsModal').style.display = 'none';
+    });
+
+    // Zavírání modálního okna úpravy rezervace ????
+    // document.querySelectorAll(".close-reservation-modal").forEach(btn => {
+    //     btn.addEventListener("click", () => {
+    //         document.getElementById("reservationEditModal").style.display = "none";
+    //     });
+    // });
+
 
 
 
@@ -166,17 +203,11 @@ document.addEventListener("DOMContentLoaded", function () {
 
         console.log("Formulář pro vytvoření tréninku byl odeslán");
 
-
-        // const repeatWeeks = parseInt(document.getElementById("repeatEveryWeek").value) || 0;
-        // const repeatIntervalInDays = repeatWeeks > 0 ? 7 : 0;
-        // const numberOfCopyConcreteTraining = repeatWeeks;
-
         const data = {
             nameOfLesson: document.getElementById("nameOfLesson").value,
             coachName: document.getElementById("coachName").value,
             startOfCurrentLesson: document.getElementById("startOfCurrentLesson").value,
             endOfCurrentLesson: document.getElementById("endOfCurrentLesson").value,
-            // dateOfCurrentLesson: document.getElementById("dateOfCurrentLesson").value,
             dateOfCurrentLesson: document.getElementById("startOfCurrentLesson").value,
             numberOfFreeSlots: parseInt(document.getElementById("capacity").value),
             repeatIntervalInDays: 7,
@@ -228,7 +259,7 @@ document.addEventListener("DOMContentLoaded", function () {
         }
     });
 
-    //Mazání tréninku
+    // === Mazání tréninku ===
     document.getElementById("deleteTrainingBtn").addEventListener("click", async function () {
         const trainingId = window.selectedTrainingId;
 
@@ -258,7 +289,7 @@ document.addEventListener("DOMContentLoaded", function () {
         }
     });
 
-    // Mazání tréninků
+    // === Mazání tréninků ===
     document.getElementById("deleteTrainingsSeriesBtn").addEventListener("click", async () => {
 
         const trainingId = window.selectedTrainingId;
@@ -269,7 +300,7 @@ document.addEventListener("DOMContentLoaded", function () {
         }
     });
 
-    //Úprava jednoho tréninku
+    // === Úprava jednoho tréninku nebo série ===
     document.getElementById("editTrainingForm").addEventListener("submit", async function (e) {
         e.preventDefault();
 
@@ -281,13 +312,16 @@ document.addEventListener("DOMContentLoaded", function () {
             numberOfFreeSlots: parseInt(document.getElementById("editCapacity").value),
             startOfCurrentLesson: document.getElementById("editStartOfCurrentLesson").value,
             endOfCurrentLesson: document.getElementById("editEndOfCurrentLesson").value,
-            dateOfCurrentLesson: document.getElementById("editStartOfCurrentLesson").value,
-
+            dateOfCurrentLesson: document.getElementById("editStartOfCurrentLesson").value
         };
 
-        console.log(JSON.stringify(data));
+        let endpoint = "/api/editTrainingChosenInOverview/" + trainingId;
+        if (editMode === "series") {
+            endpoint = "/api/editAllPlanned/" + trainingId;
+        }
+
         try {
-            const response = await fetch(`/api/editTrainingChosenInOverview/${trainingId}`, {
+            const response = await fetch(endpoint, {
                 method: "PUT",
                 headers: {
                     "Content-Type": "application/json"
@@ -296,69 +330,68 @@ document.addEventListener("DOMContentLoaded", function () {
             });
 
             if (response.ok) {
-                alert("Trénink byl úspěšně upraven.");
+                alert(editMode === "single" ? "Trénink upraven." : "Série tréninků upravena.");
                 document.getElementById("editTrainingModal").style.display = "none";
                 calendar.refetchEvents();
             } else {
-                alert("Chyba při úpravě tréninku.");
+                alert("Chyba při úpravě " + (editMode === "single" ? "tréninku." : "série."));
             }
         } catch (error) {
-            console.error("Chyba při úpravě tréninku:", error);
+            console.error("Chyba při odeslání:", error);
             alert("Nastala chyba při komunikaci se serverem.");
         }
     });
 
-
-    // Úprava série tréninků
-    document.getElementById("editTrainingForm").addEventListener("submit", async function (e) {
+// === Úprava rezervace ===
+    document.getElementById("editReservationForm").addEventListener("submit", async function (e) {
         e.preventDefault();
 
-        const trainingId = window.selectedTrainingId;
-
         const data = {
-            nameOfLesson: document.getElementById("editNameOfLesson").value,
-            coachName: document.getElementById("editCoachName").value,
-            numberOfFreeSlots: parseInt(document.getElementById("editCapacity").value),
-            startOfCurrentLesson: document.getElementById("editStartOfCurrentLesson").value,
-            endOfCurrentLesson: document.getElementById("editEndOfCurrentLesson").value,
-            dateOfCurrentLesson: document.getElementById("editStartOfCurrentLesson").value,
-
+            firstName: document.getElementById("editFirstName").value,
+            secondName: document.getElementById("editSecondName").value,
+            userEmail: document.getElementById("editEmail").value,
+            telephoneNumber: document.getElementById("editPhone").value,
+            numberOfBookedEntries: parseInt(document.getElementById("editPeople").value),
+            trainingPassedOrDeleted: false // Předpokládáme false
         };
 
-        try {
-            const response = await fetch(`/api/editAllPlanned/${trainingId}`, {
-                method: "PUT",
-                headers: {
-                    "Content-Type": "application/json"
-                },
-                body: JSON.stringify(data)
-            });
+        const response = await fetch(`/api/editReservation/${window.selectedReservationId}`, {
+            method: 'PUT',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify(data)
+        });
 
-            if (response.ok) {
-                alert("Tréninky byly úspěšně upraveny.");
-                document.getElementById("editTrainingModal").style.display = "none";
-                calendar.refetchEvents();
-            } else {
-                alert("Chyba při úpravě tréninků.");
-            }
-        } catch (error) {
-            console.error("Chyba při úpravě tréninků:", error);
-            alert("Nastala chyba při komunikaci se serverem.");
+        if (response.ok) {
+            alert('Rezervace upravena');
+            document.getElementById("reservationEditModal").style.display = "none";
+            document.getElementById("eventModal").style.display = "none";
+            calendar.refetchEvents();
+        } else {
+            alert('Chyba při úpravě rezervace');
         }
     });
+
 
     // Úprava jednoho tréninku
     document.getElementById("editTrainingBtn").addEventListener("click", () => {
-        document.getElementById("editTrainingId").value = window.selectedTrainingId;
+        editMode = "single";
 
+        const data = window.selectedTrainingData || {};
+
+        document.getElementById("editNameOfLesson").value = data.lessonName || "";
+        document.getElementById("editCoachName").value = data.coachName || "";
+        document.getElementById("editStartOfCurrentLesson").value = data.start ? new Date(data.start).toISOString().slice(0,16) : "";
+        document.getElementById("editEndOfCurrentLesson").value = data.end ? new Date(data.end).toISOString().slice(0,16) : "";
+        document.getElementById("editCapacity").value = data.capacity || "";
+
+        document.getElementById("editTrainingId").value = window.selectedTrainingId;
         document.getElementById("editTrainingModal").style.display = "block";
     });
 
     // Úprava série tréninků
     document.getElementById("editTrainingsSeriesBtn").addEventListener("click", () => {
-
+        editMode = "series";
         document.getElementById("editTrainingId").value = window.selectedTrainingId;
-
         document.getElementById("editTrainingModal").style.display = "block";
     });
 
@@ -371,15 +404,59 @@ document.addEventListener("DOMContentLoaded", function () {
         document.getElementById("reservationModal").style.display = "block";
     });
 
+    // Editace rezervace
+    document.getElementById("editReservationBtn").addEventListener("click", () => {
+        // Zavři volbu
+        document.getElementById('reservationOptionsModal').style.display = 'none';
+        const res = window.selectedReservationData;
+
+        // Předvyplň formulář na editaci
+        document.getElementById('editFirstName').value = res.firstName; // naplnit z uloženého objektu
+        document.getElementById('editSecondName').value = res.secondName;
+        document.getElementById('editEmail').value = res.userEmail;
+        document.getElementById('editPhone').value = res.telephoneNumber;
+        document.getElementById('editPeople').value = res.numberOfBookedEntries;
+
+        // Zavřeme rozcestník a otevřeme editaci
+        document.getElementById('reservationOptionsModal').style.display = 'none';
+        document.getElementById('reservationEditModal').style.display = 'block';
+    });
+
+    // Vymazání rezervace
+    document.getElementById("deleteReservationBtn").addEventListener("click", async () => {
+        // Zavři volbu
+        document.getElementById('reservationOptionsModal').style.display = 'none';
+
+            try {
+                const response = await fetch(`/api/deleteReservation/${window.selectedReservationId}`, {
+                    method: 'DELETE'
+                });
+
+                if (response.ok) {
+                    alert('Rezervace smazána.');
+                    calendar.refetchEvents();
+                    document.getElementById('eventModal').style.display = 'none';
+                } else {
+                    alert('Chyba při mazání rezervace.');
+                }
+            } catch (error) {
+                console.error("Chyba:", error);
+            }
+    });
 
 
     calendar.render()
 
-
-
-
-
-    //editReservation, deleteReservation - zatím chybí
-
+    // Logout metoda
+    document.getElementById('logoutBtn').addEventListener('click', () => {
+        fetch('/api/logoutAdmin', { method: 'POST' })
+            .then(resp => {
+                if (resp.ok)
+                    window.location.href = '/index.html';
+                else          alert('Odhlášení se nezdařilo');
+            })
+            .catch(err => console.error('Logout error:', err));
+    });
 
 });
+
