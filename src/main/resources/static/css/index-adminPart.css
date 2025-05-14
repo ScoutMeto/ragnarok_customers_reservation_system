@@ -1,0 +1,415 @@
+.training-table {
+    width: 100%;
+    border-collapse: collapse;
+    margin-top: 1em;
+    font-family: Arial, sans-serif;
+}
+
+.training-table th,
+.training-table td {
+    border: 1px solid #ccc;
+    padding: 8px;
+    text-align: center;
+    vertical-align: top;
+    height: 80px;
+}
+
+.training-table th {
+    background-color: #f2f2f2;
+}
+
+.training-block {
+    padding: 6px;
+    border-radius: 4px;
+    color: white;
+    font-size: 0.9em;
+}
+
+.type-kettlebell {
+    background-color: #007bff;
+}
+
+.type-crossfit {
+    background-color: #28a745;
+}
+
+.type-yoga {
+    background-color: #ff9800;
+}
+
+.type-boxing {
+    background-color: #dc3545;
+}
+
+.week-navigation {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    gap: 10px;
+    margin-top: 10px;
+    margin-bottom: 20px;
+    font-size: 1.2em;
+}
+
+
+/* Modal základ, css */
+.modal {
+    display: none;
+    position: fixed;
+    z-index: 1001;
+    padding-top: 60px;
+    left: 0;
+    top: 0;
+    width: 100%;
+    height: 100%;
+    overflow: auto;
+    background-color: rgba(0,0,0,0.5);
+}
+
+.modal-content {
+    background-color: #fff;
+    margin: auto;
+    padding: 20px;
+    border-radius: 6px;
+    width: 80%;
+    max-width: 400px;
+}
+
+.close-button {
+    color: #aaa;
+    float: right;
+    font-size: 24px;
+    font-weight: bold;
+    cursor: pointer;
+}
+
+/* 1a) krajní pozice zavíracího křížku v reservationEditModal */
+#reservationEditModal .modal-content {
+    position: relative;           /* aby absolutní pozicování fungovalo */
+}
+
+#reservationEditModal .close-reservation-modal {
+    float: right;
+    font-size: 24px;
+    font-weight: bold;
+    color: #aaa;
+    cursor: pointer;
+}
+
+#reservationEditModal .close-reservation-modal:hover {
+    color: #000;
+}
+
+/*.close-reservation-modal {*/
+/*    float: right;*/
+/*    font-size: 24px;*/
+/*    font-weight: bold;*/
+/*    cursor: pointer;*/
+/*}*/
+/*konec css k modalu*/
+
+/* zavírací křížek pro registraci admina */
+.close-registration-admin-modal {
+    color: #aaa;
+    float: right;
+    font-size: 24px;
+    font-weight: bold;
+    cursor: pointer;
+}
+
+/* stylizace funkcí pro hromadné mazání libovolně vybraných tréninků */
+/* zvýraznění vybrané lekce v kalendáři */
+.fc-event.aimed-selected {
+    background-color: #fff3cd !important; /* světle žluté pozadí */
+    border: 2px solid #ffc107 !important;
+}
+
+/* žluté zvýraznění vybraných lekcí pro mazání */
+.aimed-selected .fc-event-title,
+.aimed-selected .fc-event-time {
+    background-color: #fff59d !important;
+}
+
+/* zavírací tlačítko pro aimed modal */
+.close-aimed-modal {
+    color: #aaa;
+    float: right;
+    font-size: 24px;
+    font-weight: bold;
+    cursor: pointer;
+}
+
+/* seznam vybraných lekcí v modal-list */
+#aimed-list {
+    list-style: none;
+    padding: 0;
+    max-height: 200px;
+    overflow-y: auto;
+}
+#aimed-list li {
+    padding: 4px 0;
+    border-bottom: 1px solid #eee;
+}
+#aimed-list li span.id {
+    font-weight: bold;
+}
+
+/* ＞＞＞ Modal pro hromadné mazání ＜＜＜ */
+#aimed-list {
+    list-style: decimal;
+    padding-left: 1.2em;
+    max-height: 200px;
+    overflow-y: auto;
+}
+#aimed-confirm:disabled {
+    opacity: 0.5;
+    cursor: default;
+}
+/* ＞＞＞ konec styly bulk-delete modalu ＜＜＜ */
+
+/* === Panel pro hromadné mazání umístěný pod kalendářem === */
+#aimedDeleteModal {
+    display: none;           /* skryté, dokud není aktivní */
+    position: static;        /* nefixed */
+    width: 90%;
+    max-width: 360px;
+    margin: 1em auto;        /* odsazení od kalendáře */
+    background: none;        /* bez šedého přechodu */
+    pointer-events: all;     /* aby widget zůstal klikatelný */
+}
+#aimedDeleteModal .modal-content {
+    background-color: #fff;
+    padding: 20px;
+    border-radius: 6px;
+    box-shadow: 0 2px 8px rgba(0,0,0,0.2);
+}
+#aimedDeleteModal .modal-content {
+    /* ale samotná krabička pro výběr zůstane interaktivní */
+    pointer-events: all;
+}
+
+
+
+
+/* --- Transparentní eventy v týdenním/denním zobrazení, ale s viditelným textem --- */
+.fc .fc-timegrid-event {
+    background: transparent !important;   /* žádná plná výplň */
+    border: none !important;             /* žádný defaultní border */
+    color: #000 !important;              /* hlavní text černě */
+}
+
+/* Rámeček okolo eventu */
+.fc .fc-timegrid-event .fc-event-main-frame {
+    border: 1px solid #000 !important; /* tenký modrý rámeček */
+    background: transparent !important;   /* bez výplně */
+}
+
+/* Explicitně nastavit barvu názvu a času eventu */
+.fc .fc-timegrid-event .fc-event-time,
+.fc .fc-timegrid-event .fc-event-title {
+    color: #000 !important;               /* nebo jiná tmavá, dle chuti */
+    white-space: nowrap;                  /* aby se text nevytáčel do více řádků */
+    overflow: visible !important;         /* aby se text neodstínil */
+}
+/*Tučný název lekce u týdenního a denního zobrazení*/
+.fc .fc-event-title {
+    font-weight: bold !important;
+}
+
+/* ----------------------------------------
+   1) Globální typografie a form-styly
+   ---------------------------------------- */
+body, input, button, select, textarea {
+    font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+    color: #333;
+}
+
+.modal-content h2,
+.modal-content h3,
+.modal-content h4 {
+    font-weight: 600;
+    margin-bottom: 0.5em;
+}
+
+.modal-content label {
+    display: block;
+    margin-top: 0.75em;
+    font-size: 0.95rem;
+}
+.modal-content input {
+    width: 100%;
+    padding: 0.5em;
+    margin-top: 0.25em;
+    border: 1px solid #ccc;
+    border-radius: 4px;
+    box-sizing: border-box;
+}
+
+.modal-content p,
+.modal-content ul {
+    margin: 0.75em 0;
+    line-height: 1.4;
+}
+.modal-content ul {
+    padding-left: 1.2em;
+}
+
+/* ----------------------------------------
+   2) Zaoblená, větší a barevně rozlišená tlačítka
+   ---------------------------------------- */
+/* univerzální styl pro tlačítka v modálních oknech */
+.modal-content button {
+    padding: 0.6em 1em;
+    font-size: 1rem;
+    border-radius: 6px;
+    border: none;
+    cursor: pointer;
+    margin: 0.5em 0;
+    width: 100%;
+    box-sizing: border-box;
+}
+
+/* červené tlačítko pro mazání */
+#deleteTrainingBtn,
+#deleteTrainingsSeriesBtn,
+#deleteAimedTrainingsBtn,
+#deleteReservationBtn {
+    background-color: #dc3545;
+    color: #fff;
+}
+
+#deleteTrainingBtn:hover ,
+#deleteTrainingsSeriesBtn:hover ,
+#deleteAimedTrainingsBtn:hover ,
+#deleteReservationBtn:hover  {
+    background-color: #da1c2e;
+    color: #fff;
+}
+
+/* bílé tlačítko pro editaci */
+#editTrainingBtn,
+#editTrainingsSeriesBtn,
+#editReservationBtn {
+    background-color: #fff;
+    color: #333;
+    border: 1px solid #ccc;
+}
+
+#editTrainingBtn:hover ,
+#editTrainingsSeriesBtn:hover ,
+#editReservationBtn:hover  {
+    background-color: #d5d2d2;
+}
+
+/* světle modré tlačítko pro vytváření rezervace (admin) */
+#createReservationBtn,
+#aimed-confirm {
+    background-color: #bee3f8;
+    color: #333;
+}
+
+#createReservationBtn:hover {
+    background-color: #9fd6f6;
+}
+
+/* bílé tlačítko pro zrušení akce */
+#aimed-cancel {
+    background-color: #fff;
+    color: #666;
+    border: 1px solid #ccc;
+}
+
+/* potvrdit úpravu tréninku */
+#editTrainingModal .modal-content button[type="submit"] {
+    background-color: #bee3f8;
+    color: #333;
+}
+
+#editTrainingModal .modal-content button[type="submit"]:hover {
+background-color: #9fd6f6;
+}
+
+/* Zelené tlačítko pro potvrzení nové rezervace v admin části */
+#reservationEditModal button[type="submit"],
+#reservationModal button[type="submit"] {
+    background-color: #90ee90;    /* světle zelené */
+    color: #333;
+    border: none;
+}
+
+#reservationEditModal button[type="submit"]:hover,
+#reservationModal button[type="submit"]:hover {
+    background-color: #65c865;
+}
+
+/* ----------------------------------------
+   3) Centrálni zarovnání tlačítek & form
+   ---------------------------------------- */
+.button-group {
+    text-align: center;
+}
+.button-group button {
+    display: inline-block;
+    width: auto;
+    margin: 0 0.5em;
+}
+
+.modal-content form {
+    text-align: center;
+}
+.modal-content form button {
+    max-width: 200px;
+    margin: 1em auto 0;
+}
+
+/* ----------------------------------------
+   4) Stín a zaoblení modálního okna
+   ---------------------------------------- */
+.modal-content {
+    border-radius: 8px;
+    box-shadow: 0 4px 12px rgba(0,0,0,0.15);
+}
+
+
+/* 2) Tlačítko odhlášení */
+#logoutBtn {
+    background-color: #fff;       /* bílé pozadí */
+    color: #dc3545;               /* červený text */
+    border: 1px solid #dc3545;    /* červené ohraničení */
+    padding: 0.6em 1em;
+    border-radius: 6px;
+    font-size: 1rem;
+    cursor: pointer;
+    margin: 0.5em;
+}
+
+#logoutBtn:hover {
+    background-color: #dc3545;
+    color: #fff;
+}
+
+/* 2) Tlačítko nové registrace admina */
+#registrationAdminBtn {
+    background-color: #fff;       /* bílé pozadí */
+    color: #333;
+    border: 1px solid #ccc;       /* šedý rámeček stejný jako ostatní edit-tlačítka */
+    padding: 0.6em 1em;
+    border-radius: 6px;
+    font-size: 1rem;
+    cursor: pointer;
+    margin: 0.5em;
+}
+
+#registrationAdminBtn:hover {
+    background-color: #f0f0f0;
+}
+
+#confirmRegistrationAdminBtn {
+    background-color: #90ee90;    /* světle zelené */
+    color: #333;
+    border: none;
+}
+#confirmRegistrationAdminBtn:hover {
+    background-color: #65c865;    /* světle zelené */
+}
+

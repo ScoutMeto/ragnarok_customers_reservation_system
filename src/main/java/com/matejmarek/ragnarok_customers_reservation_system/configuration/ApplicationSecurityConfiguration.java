@@ -2,6 +2,7 @@ package com.matejmarek.ragnarok_customers_reservation_system.configuration;
 
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
+import org.springframework.http.HttpMethod;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.dao.DaoAuthenticationProvider;
 import org.springframework.security.config.annotation.authentication.configuration.AuthenticationConfiguration;
@@ -10,6 +11,7 @@ import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.security.web.SecurityFilterChain;
+import org.springframework.security.web.authentication.LoginUrlAuthenticationEntryPoint;
 import org.springframework.security.web.util.matcher.AntPathRequestMatcher;
 
 @Configuration
@@ -31,10 +33,13 @@ public class ApplicationSecurityConfiguration {
                 )
                 .authorizeHttpRequests(auth -> auth
                         // frontend veřejně přístupný
-                        .requestMatchers("/", "/index.html", "/index-adminPart.html", "/js/**", "/css/**").permitAll()
+                        .requestMatchers("/", "/index.html", "/js/**", "/css/**").permitAll()
                         // veřejné API
-                        .requestMatchers("/api/loginAdmin", "/api/registrationNewAdmin").permitAll()
+                        .requestMatchers("/api/loginAdmin").permitAll()
+                        .requestMatchers(HttpMethod.GET, "/api/loadAllTrainings").permitAll()
+                        .requestMatchers(HttpMethod.POST, "/api/createNewReservation").permitAll()
                         // chráněné API pro přihlášené adminy
+                        .requestMatchers("/index-adminPart.html").hasRole("ADMIN")
                         .requestMatchers("/api/**").hasRole("ADMIN")
                         .anyRequest().authenticated()
                 )
@@ -42,10 +47,14 @@ public class ApplicationSecurityConfiguration {
                 .logout(logout -> logout
                         .logoutRequestMatcher(new AntPathRequestMatcher("/api/logoutAdmin"))
                         .logoutSuccessUrl("/index.html").permitAll()
+                )
+                .exceptionHandling(ex -> ex
+                        .authenticationEntryPoint(new LoginUrlAuthenticationEntryPoint("/index.html"))
+                        .accessDeniedHandler((req, res, exc) -> res.sendRedirect("/index.html"))
                 );
-
         return http.build();
     }
+
 
     @Bean
     public AuthenticationManager authenticationManager(AuthenticationConfiguration configuration) throws Exception {

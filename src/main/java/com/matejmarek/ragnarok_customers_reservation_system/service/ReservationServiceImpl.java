@@ -1,9 +1,7 @@
 package com.matejmarek.ragnarok_customers_reservation_system.service;
 
 import com.matejmarek.ragnarok_customers_reservation_system.dto.ReservationDTO;
-import com.matejmarek.ragnarok_customers_reservation_system.dto.TrainingDTO;
 import com.matejmarek.ragnarok_customers_reservation_system.dto.mapper.ReservationMapper;
-import com.matejmarek.ragnarok_customers_reservation_system.dto.mapper.TrainingMapper;
 import com.matejmarek.ragnarok_customers_reservation_system.entity.ReservationEntity;
 import com.matejmarek.ragnarok_customers_reservation_system.entity.TrainingEntity;
 import com.matejmarek.ragnarok_customers_reservation_system.entity.repository.ReservationRepository;
@@ -18,14 +16,8 @@ public class ReservationServiceImpl implements ReservationService {
 
     @Autowired
     ReservationRepository reservationRepository;
-
-    @Autowired
-    TrainingMapper trainingMapper;
-
     @Autowired
     ReservationMapper reservationMapper;
-    @Autowired
-    TrainingService trainingService;
     @Autowired
     TrainingRepository trainingRepository;
 
@@ -73,24 +65,4 @@ public class ReservationServiceImpl implements ReservationService {
             throw new EntityNotFoundException("Rezervace s ID " + reservationId + " nenalezena.");
         }
     }
-//    @Override
-//    @Transactional
-//    public void deleteReservation(Long reservationId) {
-//        // Najdeme rezervaci podle ID
-//        ReservationEntity existingReservation = reservationRepository.findById(reservationId)
-//                .orElseThrow(() -> new EntityNotFoundException("Rezervace s ID " + reservationId + " nenalezena."));
-//
-//        // Smažeme rezervaci
-//        reservationRepository.deleteById(reservationId);
-//        System.out.println("Rezervace s ID " + existingReservation.getReservationId() + " byla úspěšně odstraněna.");
-//    }
-
-    //Chatem doporučený vzhled metody "delete"
-//    public void deleteReservation(Long reservationId) {
-//        if (!reservationRepository.existsById(reservationId)) {
-//            throw new EntityNotFoundException("Rezervace s ID " + reservationId + " nenalezena.");
-//        }
-//        reservationRepository.deleteById(reservationId);
-//        reservationRepository.flush();
-//    }
 }

@@ -25,7 +25,6 @@ public class AdminController {
 
     ////////////////////////////////////////////////////////////////////////////////////////
 
-    //Tested by postman - OK
     @PostMapping({"api/registrationNewAdmin/", "api/registrationNewAdmin"})
     public AdminDTO addAdmin(@RequestBody @Valid AdminDTO adminDTO) {
         System.out.println("Požadavek na vytvoření nového administrátora (AdminController, addAdmin): " + adminDTO);

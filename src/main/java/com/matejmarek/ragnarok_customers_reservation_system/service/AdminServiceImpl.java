@@ -3,7 +3,7 @@ package com.matejmarek.ragnarok_customers_reservation_system.service;
 import com.matejmarek.ragnarok_customers_reservation_system.dto.AdminDTO;
 import com.matejmarek.ragnarok_customers_reservation_system.entity.AdminEntity;
 import com.matejmarek.ragnarok_customers_reservation_system.entity.repository.AdminRepository;
-import com.matejmarek.ragnarok_customers_reservation_system.exceptionHandler.DuplicateAdminEmailRegistratrionExcepiton;
+import com.matejmarek.ragnarok_customers_reservation_system.exceptionHandler.DuplicateAdminEmailRegistrationException;
 import jakarta.servlet.ServletException;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
@@ -50,20 +50,15 @@ public class AdminServiceImpl implements AdminService, UserDetailsService {
             savedUserDTO.setAdminId(adminEntity.getAdminId());
             savedUserDTO.setAdminEmail(adminEntity.getAdminEmail());
 
-            System.out.println("Profil nového admina vytvořen:" + model + "Vyčkej na potvrzení autorizačních práv.");
+            System.out.println("Profil nového admina vytvořen:" + model);
 
                 return savedUserDTO;
 
         } catch (DataIntegrityViolationException dataIntegrityViolationException) {
-            throw new DuplicateAdminEmailRegistratrionExcepiton();
+            throw new DuplicateAdminEmailRegistrationException();
         }
     }
 
-//    @Override
-//    public UserDetails loadUserByUsername(String adminName) throws UsernameNotFoundException {
-//        return adminRepository.findByAdminEmail(adminName)
-//                .orElseThrow(() -> new UsernameNotFoundException("Jméno " + adminName + " nebylo nalezeno."));
-//    }
 @Override
 public UserDetails loadUserByUsername(String adminEmail) throws UsernameNotFoundException {
     AdminEntity admin = adminRepository.findByAdminEmail(adminEmail)
@@ -77,7 +72,6 @@ public UserDetails loadUserByUsername(String adminEmail) throws UsernameNotFound
 
 }
 
-    // Metoda pro odhlášení administrátora
     @Override
     public void logoutAdmin(HttpServletRequest request, HttpServletResponse response)
             throws ServletException, IOException {
@@ -104,9 +98,6 @@ public UserDetails loadUserByUsername(String adminEmail) throws UsernameNotFound
 
             return ResponseEntity.ok(dto);
         }
-
         return ResponseEntity.status(HttpStatus.UNAUTHORIZED).build();
-//        return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body("Uživatel není přihlášen");
-
     }
 }

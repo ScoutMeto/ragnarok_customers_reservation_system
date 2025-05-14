@@ -17,11 +17,15 @@ public class ReservationController {
     @Autowired
     ReservationService reservationService;
 
+    ////////////////////////////////////////////////////////////////////////////////////////
+
     @PostMapping({"api/createNewReservation/", "api/createNewReservation"})
     public ReservationDTO addReservation(@RequestBody @Valid ReservationDTO reservationDTO) {
         System.out.println("Požadavek na vytvoření nové rezervace (ReservationController, addReservation): " + reservationDTO);
         return reservationService.createReservation(reservationDTO);
     }
+
+    ////////////////////////////////////////////////////////////////////////////////////////
 
     // PUT endpoint pro úpravu rezervace
     @PutMapping({"/api/editReservation/{reservationId}/", "/api/editReservation/{reservationId}"})
@@ -29,6 +33,8 @@ public class ReservationController {
         System.out.println("Požadavek na úpravu rezervace (ReservationController, editReservation): " + reservationId);
         return reservationService.editReservation(reservationId, reservationDTO);
     }
+
+    ////////////////////////////////////////////////////////////////////////////////////////
 
     // DELETE endpoint pro smazání rezervace
     @DeleteMapping({"/api/deleteReservation/{reservationId}/", "/api/deleteReservation/{reservationId}"})

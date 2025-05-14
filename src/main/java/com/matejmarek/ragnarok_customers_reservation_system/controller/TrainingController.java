@@ -1,8 +1,8 @@
 package com.matejmarek.ragnarok_customers_reservation_system.controller;
 
+import com.matejmarek.ragnarok_customers_reservation_system.dto.AimedTrainingsRequestDTO;
 import com.matejmarek.ragnarok_customers_reservation_system.dto.TrainingDTO;
 import com.matejmarek.ragnarok_customers_reservation_system.dto.TrainingResponseDTO;
-import com.matejmarek.ragnarok_customers_reservation_system.dto.mapper.TrainingMapper;
 import com.matejmarek.ragnarok_customers_reservation_system.entity.repository.TrainingRepository;
 import com.matejmarek.ragnarok_customers_reservation_system.service.AdminService;
 import com.matejmarek.ragnarok_customers_reservation_system.service.TrainingService;
@@ -33,13 +33,13 @@ public class TrainingController {
     AdminService adminService;
 
 
-
     @PostMapping({"api/createNewTraining/", "api/createNewTraining"})
     public TrainingDTO addTraining (@RequestBody @Valid TrainingDTO trainingDTO) {
         System.out.println("Požadavek na vytvoření nového tréninku (TrainingController, addTraining): " + trainingDTO);
         return trainingService.createTraining(trainingDTO);
     }
 
+    ////////////////////////////////////////////////////////////////////////////////////////
 
     @GetMapping({"api/loadAllTrainings/", "api/loadAllTrainings"})
     public List<TrainingResponseDTO> getTrainingsForCalendar(
@@ -55,6 +55,8 @@ public class TrainingController {
         return trainingService.getAllTrainingsAsCalendarEvents(startDate, endDate);
     }
 
+    ////////////////////////////////////////////////////////////////////////////////////////
+
     @GetMapping({"api/loadOneTraining/{id}/", "api/loadOneTraining/{id}"})
     public TrainingDTO getOneTraining(@PathVariable("id") Long trainingId) {
         System.out.println("Požadavek na načtení jednoho vybraného tréninků (TrainingController, getOneTraining");
@@ -68,12 +70,16 @@ public class TrainingController {
 
     }
 
+    ////////////////////////////////////////////////////////////////////////////////////////
+
     @DeleteMapping({"api/deleteTrainingChosenInOverview/{id}/", "api/deleteTrainingChosenInOverview/{id}"})
     public ResponseEntity<Void> removeTraining(@PathVariable("id") Long trainingId) {
         System.out.println("Požadavek na odstranění zvoleného tréninku podle načteného ID: " + trainingId + ". Spolu s tréninkem dojde ke smazání všech rezervací.");
         trainingService.removeOneTraining(trainingId);
         return ResponseEntity.noContent().build();
     }
+
+    ////////////////////////////////////////////////////////////////////////////////////////
 
     @DeleteMapping({"api/deleteTrainingsChosenInOverview/{id}/", "api/deleteTrainingsChosenInOverview/{id}"})
     public ResponseEntity<Void> removeTrainings(@PathVariable("id") Long trainingId) {
@@ -82,12 +88,25 @@ public class TrainingController {
         return ResponseEntity.noContent().build();
     }
 
+    ////////////////////////////////////////////////////////////////////////////////////////
+
+    @DeleteMapping({"api/deleteAimedTrainingsChosenInOverview/", "api/deleteAimedTrainingsChosenInOverview"})
+    public ResponseEntity<Void> removeAimedTrainings(@RequestBody AimedTrainingsRequestDTO amimedTrainingsRequestDTO) {
+        System.out.println("Požadavek na odstranění zvolených tréninku podle načtených ID. Spolu s každým tréninkem dojde ke smazání všech rezervací.");
+        trainingService.removeAimedTrainings(amimedTrainingsRequestDTO.getTrainingIds());
+        return ResponseEntity.noContent().build();
+    }
+
+    ////////////////////////////////////////////////////////////////////////////////////////
+
     // PUT metoda pro úpravu jednoho vybraného tréninku
     @PutMapping({"api/editTrainingChosenInOverview/{trainingId}/", "api/editTrainingChosenInOverview/{trainingId}"})
     public TrainingDTO editTraining (@PathVariable("trainingId") Long trainingId, @RequestBody TrainingDTO trainingDTO) {
         System.out.println("Požadavek na úpravu zvoleného tréninku podle načteného ID: " + trainingId + ". Nedojde ke smazání rezervací.");
         return trainingService.editOneTraining(trainingId, trainingDTO);
     }
+
+    ////////////////////////////////////////////////////////////////////////////////////////
 
     // PUT metoda pro úpravu všech následujících tréninků, včetně aktuálně vybraného
     @PutMapping({"api/editAllPlanned/{trainingId}/", "api/editAllPlanned/{trainingId}"})
@@ -96,6 +115,4 @@ public class TrainingController {
         trainingService.editAllPlannedTrainings(trainingId, trainingDTO);
         return ResponseEntity.noContent().build();  // HTTP 204 No Content pokud úprava proběhne úspěšně
     }
-
-
 }

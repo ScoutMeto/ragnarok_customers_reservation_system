@@ -3,10 +3,7 @@ package com.matejmarek.ragnarok_customers_reservation_system.entity;
 import jakarta.persistence.*;
 import lombok.Getter;
 import lombok.Setter;
-
-import java.sql.Time;
 import java.time.LocalDateTime;
-import java.time.LocalTime;
 import java.util.List;
 
 @Entity(name = "training")

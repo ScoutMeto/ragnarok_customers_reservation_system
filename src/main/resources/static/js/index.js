@@ -1,5 +1,155 @@
+
+document.addEventListener("DOMContentLoaded", function () {
+
+    const apiBase = '/api';
+
+    //responzivní design
+    function getResponsiveView() {
+        const width = window.innerWidth;
+        // if (width < 600) return 'timeGridDay';          // mobil
+        if (width < 1024) return 'timeGridDay';      // tablet / menší notebook
+        return 'dayGridMonth';                        // velká obrazovka
+    }
+
+    // kalendář
+    const calendarEl = document.getElementById("calendar");
+    const calendar = new FullCalendar.Calendar(calendarEl, {
+        initialView: getResponsiveView(),
+        locale: "cs",
+        firstDay: 1,       // pondělí (0 = neděle, 1 = pondělí, …)
+        headerToolbar: {
+            left: "prev,next today",
+            center: "title",
+            right: "dayGridMonth,timeGridWeek,timeGridDay"
+        },
+        // Výchozí nastavení času (scroll)
+        scrollTime: "16:00:00",
+
+        buttonText: {
+            today: 'dnes',
+            month: 'měsíc',
+            week:  'týden',
+            day:   'den'
+        },
+        events: {
+            url: "/api/loadAllTrainings",
+            method: "GET",
+            failure: () => alert("Chyba při načítání lekcí")
+        },
+
+        eventDidMount: function (info) {
+            const props = info.event.extendedProps;
+            // pokud je plno, přidáme červený rámeček
+            if (props.numberOfReservations >= props.numberOfFreeSlots) {
+                info.el.classList.add("full");
+            }
+        },
+
+        eventClick: function (info) {
+            const props = info.event.extendedProps;
+            window.selectedTrainingId = props.trainingId;
+
+            // naplníme modal
+            document.getElementById("modal-title").textContent = info.event.title;
+            document.getElementById("modal-coach").textContent = props.coachName;
+            document.getElementById("modal-capacity").textContent = props.numberOfFreeSlots;
+            document.getElementById("modal-reservations").textContent = props.numberOfReservations;
+
+            // kontrola kapacity
+            const createBtn = document.getElementById("createReservationBtn");
+            const msg = document.getElementById("modal-message");
+            if (props.numberOfReservations >= props.numberOfFreeSlots) {
+                createBtn.classList.add("disabled");
+                msg.style.display = "block";
+            } else {
+                createBtn.classList.remove("disabled");
+                msg.style.display = "none";
+            }
+
+            document.getElementById("eventModal").style.display = "block";
+        }
+    });
+
+    calendar.render();
+    // načtení respozivity
+    window.addEventListener('resize', () => {
+        calendar.changeView(getResponsiveView());
+    });
+
+    // Zavírání detail-modalu
+    document.querySelector(".close-button")
+        .addEventListener("click", () => document.getElementById("eventModal").style.display = "none");
+
+    // Otevření reservation‐modalu
+    document.getElementById("createReservationBtn")
+        .addEventListener("click", () => {
+            document.getElementById("reservationTrainingId").value = window.selectedTrainingId;
+            document.getElementById("reservationModal").style.display = "block";
+        });
+
+    // Zavírání reservation‐modalu
+    document.querySelector(".close-reservation-modal")
+        .addEventListener("click", () => document.getElementById("reservationModal").style.display = "none");
+
+    // Odeslání formuláře rezervace
+    document.getElementById("reservationForm")
+        .addEventListener("submit", async function (e) {
+            e.preventDefault();
+
+            const capacity = parseInt(document.getElementById("modal-capacity").textContent);
+            const booked   = parseInt(document.getElementById("modal-reservations").textContent);
+            const requested = parseInt(document.getElementById("numberOfPeople").value);
+            const available = capacity - booked;
+
+            if (requested > available) {
+                alert(`Maximálně lze rezervovat ${available} míst.`);
+                return;
+            }
+
+            const data = {
+                firstName: document.getElementById("firstName").value,
+                secondName: document.getElementById("secondName").value,
+                userEmail: document.getElementById("userEmail").value,
+                telephoneNumber: document.getElementById("phone").value,
+                trainingId: parseInt(document.getElementById("reservationTrainingId").value),
+                numberOfBookedEntries: requested
+            };
+
+            const resp = await fetch("/api/createNewReservation", {
+                method: "POST",
+                headers: { "Content-Type": "application/json" },
+                body: JSON.stringify(data)
+            });
+
+            if (resp.ok) {
+                alert("Rezervace úspěšně vytvořena.");
+                document.getElementById("reservationModal").style.display = "none";
+                document.getElementById("eventModal").style.display = "none";
+                calendar.refetchEvents();
+            } else {
+                alert("Chyba při vytváření rezervace.");
+            }
+        });
+
+});
+
+document.querySelector('.login-toggle').addEventListener('click', () => {
+    document.getElementById('loginDropdown')
+        .classList.toggle('open');
+});
+
+//login dropdown
+// pokud chcete dropdown zavřít při kliknutí venku:
+document.addEventListener('click', (e) => {
+    const dropdown = document.getElementById('loginDropdown');
+    const toggle   = document.querySelector('.login-toggle');
+    if (!dropdown.contains(e.target) && !toggle.contains(e.target)) {
+        dropdown.classList.remove('open');
+    }
+});
+
 async function login() {
-    const email = document.getElementById("email").value;
+    const email = document.getElementById("emailAdmin").value;
     const password = document.getElementById("password").value;
 
     const res = await fetch('/api/loginAdmin', {
@@ -17,28 +167,3 @@ async function login() {
         alert('Přihlášení selhalo');
     }
 }
-
-//nová rezervace
-document.getElementById("reservationForm").addEventListener("submit", async function (e) {
-    e.preventDefault();
-
-    const data = {
-        name: document.getElementById("name").value,
-        email: document.getElementById("emailReservation").value,
-        phone: document.getElementById("phone").value,
-        trainingId: parseInt(document.getElementById("trainingId").value),
-        numberOfPeople: parseInt(document.getElementById("numberOfPeople").value),
-    };
-
-    const response = await fetch('/api/reservation', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify(data)
-    });
-
-    if (response.ok) {
-        alert('Rezervace vytvořena');
-    } else {
-        alert('Chyba při vytváření rezervace');
-    }
-});

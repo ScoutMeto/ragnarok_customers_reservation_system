@@ -3,10 +3,9 @@
 <head>
     <meta charset="UTF-8">
     <title>Administrátorská část</title>
-    <link rel="stylesheet" href="/index-adminPart.css">
+    <link rel="stylesheet" href="/css/index-adminPart.css">
     <script src='https://cdn.jsdelivr.net/npm/fullcalendar/index.global.min.js'></script>
     <script src="/js/index-adminPart.js" defer></script>
-
 </head>
 <body>
 
@@ -25,11 +24,12 @@
 
             <div id="trainingActions">
                 <h4>Akce</h4>
-                <button id="deleteTrainingBtn">🗑️ Smazat trénink</button>
-                <button id="deleteTrainingsSeriesBtn">🗑️ Smazat sérii tréninků</button>
-                <button id="editTrainingBtn">✏️ Upravit trénink</button>
-                <button id="editTrainingsSeriesBtn">✏️ Upravit sérii tréninků</button>
-                <button id="createReservationBtn">➕ Vytvořit rezervaci</button>
+                <button id="deleteTrainingBtn">🗑️ Smazat trénink</button><br><br>
+                <button id="deleteTrainingsSeriesBtn">🗑️ Smazat sérii tréninků</button><br><br>
+                <button id="deleteAimedTrainingsBtn">🗑️ Smazat libovolně vybrané tréninky</button><br><br>
+                <button id="editTrainingBtn">✏️ Upravit trénink</button><br><br>
+                <button id="editTrainingsSeriesBtn">✏️ Upravit sérii tréninků</button><br><br>
+                <button id="createReservationBtn">➕ Vytvořit rezervaci</button><br><br>
             </div>
 
             <hr>
@@ -41,18 +41,6 @@
         </div>
     </div>
 </section>
-
-<!--<section>-->
-<!--    <h2>Rezervace</h2>-->
-<!--    <button onclick="getAllReservations()">Zobrazit všechny rezervace</button>-->
-<!--    <button onclick="deleteReservation()">Smazat rezervaci podle ID</button>-->
-<!--    <button onclick="deleteAllReservationsForTraining()">Smazat rezervace pro trénink</button>-->
-<!--</section>-->
-
-
-
-
-
 
 <!-- === Modální okno pro vytvoření tréninku === -->
 <div id="trainingModal" class="modal">
@@ -83,7 +71,7 @@
     </div>
 </div>
 
-<!-- === Modální okno pro úpravu tréninku/ú === -->
+<!-- === Modální okno pro úpravu tréninku/ů === -->
 <div id="editTrainingModal" class="modal">
     <div class="modal-content">
         <span class="close-edit-training-modal" style="float:right;cursor:pointer;font-size:20px;">&times;</span>
@@ -142,7 +130,7 @@
     </div>
 </div>
 
-<!-- === Modal pro volbu editace nebo mazání === -->
+<!-- === Modal pro volbu editace nebo mazání rezervací === -->
 <div id="reservationOptionsModal" class="modal">
     <div class="modal-content">
         <span class="close close-options-modal">&times;</span>
@@ -182,7 +170,45 @@
     </div>
 </div>
 
+<!-- === Modální okno pro vytvoření nového profilu admina === -->
+<div id="registrationAdminModal" class="modal" style="display: none;">
+    <div class="modal-content">
+        <span class="close-registration-admin-modal">&times;</span>
+        <h2>Vytvořit profil</h2>
+        <form id="registrationAdminForm">
+
+            <label for="nickname">Jméno:</label>
+            <input type="text" id="nickname" name="nickname" required><br><br>
+
+            <label for="adminEmail">E-mail:</label>
+            <input type="email" id="adminEmail" name="adminEmail" required><br><br>
+
+            <label for="adminPassword">Heslo (aspoň 6 znaků):</label>
+            <input type="password" id="adminPassword" name="adminPassword" required><br><br>
+
+            <button type="submit" id="confirmRegistrationAdminBtn">Vytvořit</button>
+        </form>
+    </div>
+</div>
+
 <div id='calendar'></div>
+
+<!-- === Modální okno pro hromadné mazání tréninků === -->
+<div id="aimedDeleteModal">
+    <div class="modal-content">
+        <span id="closeAimedModal" class="close-button">&times;</span>
+        <h3>Hromadné mazání tréninků</h3>
+        <p>Vybráno lekcí: <span id="aimed-count">0</span></p>
+        <ul id="aimed-list"></ul>
+        <button id="aimed-confirm" disabled>Potvrdit mazání</button>
+        <button id="aimed-cancel">Zrušit</button>
+    </div>
+</div>
+
+<section>
+    <h2>Registrace nového admina</h2>
+    <button id="registrationAdminBtn">Vytvořit profil</button>
+</section>
 
 <section>
     <h2>Odhlášení</h2>

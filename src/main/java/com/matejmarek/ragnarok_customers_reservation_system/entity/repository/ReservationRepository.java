@@ -14,9 +14,6 @@ import java.util.List;
 public interface ReservationRepository extends JpaRepository<ReservationEntity, Long>, JpaSpecificationExecutor<ReservationEntity> {
     List<ReservationEntity> findByTraining_TrainingId(Long trainingId);
 
-//    @Modifying
-//    void deleteReservationEntityByReservationId(Long reservationId);
-
     @Modifying
     @Transactional          // nebo na service-vrstvě
     @Query("DELETE FROM reservations r WHERE r.reservationId = :id")

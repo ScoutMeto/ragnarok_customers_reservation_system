@@ -2,25 +2,63 @@ document.addEventListener("DOMContentLoaded", function () {
 
     const apiBase = '/api';
 
-    //responzivní design
+    // Responzivní design
     function getResponsiveView() {
         const width = window.innerWidth;
-        if (width < 600) return 'timeGridDay';          // mobil
-        if (width < 1024) return 'timeGridWeek';      // tablet / menší notebook
+        // if (width < 600) return 'timeGridDay';          // mobil
+        if (width < 1024) return 'timeGridDay';      // tablet / menší notebook
         return 'dayGridMonth';                        // velká obrazovka
     }
 
     let editMode = "single"; // nebo "series"
 
-    // načtení kalendáře
+    // ===== hromadné mazání =====
+    let aimedMode = false;
+    let aimedSelections = [];
+    const aimedModal        = document.getElementById("aimedDeleteModal");
+    const aimedCountEl      = document.getElementById("aimed-count");
+    const aimedListEl       = document.getElementById("aimed-list");
+    const aimedConfirmBtn   = document.getElementById("aimed-confirm");
+    const aimedCancelBtn    = document.getElementById("aimed-cancel");
+    const closeAimedBtn     = document.getElementById("closeAimedModal");
+// ===========================
+
+    // přidá/odstraní žlutou třídu podle ID
+    function highlightAimedEvent(id) {
+        const el = document.querySelector(`[data-event-id="${id}"]`);
+        if (el) el.classList.add('aimed-selected');
+    }
+    function unhighlightAimedEvent(id) {
+        const el = document.querySelector(`[data-event-id="${id}"]`);
+        if (el) el.classList.remove('aimed-selected');
+    }
+
+    /**
+     * Sundá žluté zvýraznění ze všech dosud vybraných lekcí
+     * a vyčistí seznam aimedSelections.
+     */
+    function clearAimedSelection() {
+        aimedSelections.forEach(id => unhighlightAimedEvent(id));
+        aimedSelections = [];                // vyčistí pole
+        updateAimedUI();                     // překreslí "Vybráno lekcí: ..." a seznam
+    }
+
+    // Načtení kalendáře
     const calendarEl = document.getElementById('calendar')
     const calendar = new FullCalendar.Calendar(calendarEl, {
         initialView: getResponsiveView(),
         locale: 'cs',
+        firstDay: 1,       // pondělí (0 = neděle, 1 = pondělí, …)
         headerToolbar: {
             left: 'prev,next today',
             center: 'title',
             right: 'dayGridMonth,timeGridWeek,timeGridDay'
+        },
+        buttonText: {
+            today: 'dnes',
+            month: 'měsíc',
+            week:  'týden',
+            day:   'den'
         },
         events: {
             url: '/api/loadAllTrainings',
@@ -30,7 +68,7 @@ document.addEventListener("DOMContentLoaded", function () {
             }
         },
 
-        // zobrazení pro velké obrazovky
+        // Zobrazení pro velké obrazovky
         eventDidMount: function (info) {
             const width = window.innerWidth;
             if (width >= 1024) {  // Pouze pro velké obrazovky
@@ -41,23 +79,41 @@ document.addEventListener("DOMContentLoaded", function () {
 
                 const extraInfo = `\nNázev lekce: ${title} \nTrenér: ${coachNameForExtendedProps}\nKapacita lekce: ${capacity} / Rezervace: ${reservations}`;
 
-                const titleEl = info.el.querySelector('.fc-event-title');
-                if (titleEl) {
-                    titleEl.innerText += extraInfo;
-                }
-            }
+                const tId = info.event.extendedProps.trainingId;
+                    if (tId != null) {
+                          info.el.setAttribute('data-event-id', tId);
+                          // pokud už jsme v bulk-módu a tohle ID je v aimedSelections, znovu ho naimportujeme
+                              if (aimedSelections.includes(tId)) {
+                                info.el.classList.add('aimed-selected');
+                              }
+                        }
+                    }
         },
 
         // Modální okno po kliknutí na lekci
         eventClick: function (info) {
-            const width = window.innerWidth;
-            // if (width < 1024) { // zobrazit modal na mobilu / tabletu
+            const width = window.innerWidth; // if (width < 1024) { // zobrazit modal na mobilu / tabletu
+
+            // pokud jsme v bulk-delete módu, jen sbíráme ID a exit
+            if (aimedMode) {
+                const id = info.event.extendedProps.trainingId;
+                // toggle výběru
+                const idx = aimedSelections.indexOf(id);
+                if (idx >= 0) {
+                    aimedSelections.splice(idx, 1);
+                    info.el.classList.remove("aimed-selected");
+                } else {
+                    aimedSelections.push(id);
+                    info.el.classList.add("aimed-selected");
+                }
+                updateAimedUI();
+                return;
+            }
 
                 const event = info.event;
                 const props = event.extendedProps;
-                // Uložíme trainingId do globální proměnné pro pozdější použití
-                window.selectedTrainingId = props.trainingId;
-                window.selectedTrainingData  = {
+                window.selectedTrainingId = props.trainingId; // Uložím trainingId do globální proměnné pro pozdější použití
+                window.selectedTrainingData  = { // Uložím obecná data o tréninku do globální proměnné pro pozdější použití
                 lessonName: props.lessonName,
                 coachName: props.coachName,
                 start: info.event.start,
@@ -73,7 +129,6 @@ document.addEventListener("DOMContentLoaded", function () {
                 document.getElementById('modal-end').textContent = new Date(event.end).toLocaleString();
 
                 document.getElementById('eventModal').style.display = 'block';
-            // }
 
 
             // Načti rezervace
@@ -91,39 +146,14 @@ document.addEventListener("DOMContentLoaded", function () {
                 li.textContent = `${res.firstName} ${res.secondName}, ${res.userEmail}, ${res.telephoneNumber}, ${res.numberOfBookedEntries} (počet osob)`;
                 li.style.cursor = "pointer";
                 li.addEventListener("click", () => {
-                    window.selectedReservationId = res.reservation_id; // <<< TADY uložíš ID rezervace globálně - přístupné dál pro další metody, které ho potřebují
-                    window.selectedReservationData = res;             // Uložíme celý objekt rezervace
+                    window.selectedReservationId = res.reservation_id; // ID rezervace globálně dostupné
+                    window.selectedReservationData = res;             // Data celého objektu rezervace globálně dostupné
 
                     console.log("Vybrané ID rezervace:", window.selectedReservationId);
 
                     // Otevřeme vlastní modal s volbou
                     document.getElementById('reservationOptionsModal').style.display = 'block';
 
-                    // if (confirm("Upravit nebo smazat rezervaci?")) {
-                    //     // Otevřít modální okno s předvyplněnými daty
-                    //     document.getElementById('editReservationId').value = selectedReservationId;
-                    //     document.getElementById('editFirstName').value = res.firstName;
-                    //     document.getElementById('editSecondName').value = res.secondName;
-                    //     document.getElementById('editEmail').value = res.userEmail;
-                    //     document.getElementById('editPhone').value = res.telephoneNumber;
-                    //     document.getElementById('editPeople').value = res.numberOfBookedEntries;
-                    //
-                    //     document.getElementById('reservationEditModal').style.display = 'block';
-                    // } else if (confirm("Chcete smazat tuto rezervaci?")) {
-                    //     if (confirm("Opravdu chcete smazat rezervaci?")) {
-                    //         fetch(`/api/deleteReservation/${selectedReservationId}`, {
-                    //             method: 'DELETE'
-                    //         })
-                    //             .then(response => {
-                    //                 if (response.ok) {
-                    //                     alert('Rezervace smazána');
-                    //                     calendar.refetchEvents();
-                    //                 } else {
-                    //                     alert('Chyba při mazání rezervace');
-                    //                 }
-                    //             });
-                    //     }
-                    // }
                 });
                 listContainer.appendChild(li);
             });
@@ -148,15 +178,11 @@ document.addEventListener("DOMContentLoaded", function () {
 
             startInput.value = clickedDate.toISOString().slice(0, 16); // yyyy-MM-ddTHH:mm
             endInput.value = defaultEnd.toISOString().slice(0, 16);
-        }
+        },
     })
 
 
-
-
-
-
-
+    // Zavírání modalů
     // Zavření modálního okna (obecně)
     document.querySelector('.close-button').addEventListener('click', function () {
         document.getElementById('eventModal').style.display = 'none';
@@ -187,14 +213,35 @@ document.addEventListener("DOMContentLoaded", function () {
         document.getElementById('reservationOptionsModal').style.display = 'none';
     });
 
-    // Zavírání modálního okna úpravy rezervace ????
-    // document.querySelectorAll(".close-reservation-modal").forEach(btn => {
-    //     btn.addEventListener("click", () => {
-    //         document.getElementById("reservationEditModal").style.display = "none";
-    //     });
+    // Zavření modálního okna pro funkci "registrationNewAdmin"
+    document.querySelector('.close-registration-admin-modal').addEventListener('click', function() {
+        document.getElementById('registrationAdminModal').style.display = 'none';
+    });
+
+    // Zavření modální okna aimed modalu
+    // document.querySelector(".close-aimed-modal").addEventListener("click", () => {
+    //     cancelAimed();
     // });
+    //
+    // // Zrušení aimed modalu
+    // document.getElementById("aimed-cancel").addEventListener("click", () => {
+    //     cancelAimed();
+    // });
+    closeAimedBtn.addEventListener("click", () => {
+        clearAimedSelection();
+        closeAimed();
+    });
+    aimedCancelBtn.addEventListener("click", () => {
+        clearAimedSelection();
+        closeAimed();
+    });
 
-
+    function closeAimed(){
+        aimedMode = false;
+        aimedSelections = [];
+        aimedModal.style.display = "none";
+        document.getElementById("trainingActions").style.display = "block";
+    }
 
 
     // === Vytvoření tréninku ===
@@ -371,8 +418,33 @@ document.addEventListener("DOMContentLoaded", function () {
         }
     });
 
+    // === Vytvoření admin profilu ===
+    document.getElementById("registrationAdminForm").addEventListener("submit", async function (e) {
+        e.preventDefault();
 
-    // Úprava jednoho tréninku
+        const data = {
+            nickname: document.getElementById("nickname").value,
+            adminEmail: document.getElementById("adminEmail").value,
+            password: document.getElementById("adminPassword").value,
+        };
+
+        const response = await fetch('/api/registrationNewAdmin', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify(data)
+        });
+
+        if (response.ok) {
+            alert('Profil nového admina vytvořen.');
+            document.getElementById("registrationAdminModal").style.display = "none";
+            calendar.refetchEvents(); // obnoví kalendář
+        } else {
+            alert('Chyba při vytváření profilu admina.');
+        }
+    });
+
+
+    // === Úprava jednoho tréninku - reakce na btn ===
     document.getElementById("editTrainingBtn").addEventListener("click", () => {
         editMode = "single";
 
@@ -388,14 +460,14 @@ document.addEventListener("DOMContentLoaded", function () {
         document.getElementById("editTrainingModal").style.display = "block";
     });
 
-    // Úprava série tréninků
+    // === Úprava série tréninků - reakce na btn ===
     document.getElementById("editTrainingsSeriesBtn").addEventListener("click", () => {
         editMode = "series";
         document.getElementById("editTrainingId").value = window.selectedTrainingId;
         document.getElementById("editTrainingModal").style.display = "block";
     });
 
-    // Vytvoření rezervace
+    // === Vytvoření rezervace - reakce na btn ===
     document.getElementById("createReservationBtn").addEventListener("click", () => {
         // Předvyplní trainingId do formuláře
         document.getElementById("reservationTrainingId").value = window.selectedTrainingId;
@@ -404,7 +476,7 @@ document.addEventListener("DOMContentLoaded", function () {
         document.getElementById("reservationModal").style.display = "block";
     });
 
-    // Editace rezervace
+    // === Editace rezervace - reakce na btn===
     document.getElementById("editReservationBtn").addEventListener("click", () => {
         // Zavři volbu
         document.getElementById('reservationOptionsModal').style.display = 'none';
@@ -422,7 +494,7 @@ document.addEventListener("DOMContentLoaded", function () {
         document.getElementById('reservationEditModal').style.display = 'block';
     });
 
-    // Vymazání rezervace
+    // === Vymazání rezervace - reakce na btn ===
     document.getElementById("deleteReservationBtn").addEventListener("click", async () => {
         // Zavři volbu
         document.getElementById('reservationOptionsModal').style.display = 'none';
@@ -445,15 +517,91 @@ document.addEventListener("DOMContentLoaded", function () {
     });
 
 
+    // === Vymazání vybraných tréninků skrz aimed modal - reakce na btn ===
+    document.getElementById("deleteAimedTrainingsBtn").addEventListener("click", () => {
+        // 1) zavřeme hlavní modal
+        document.getElementById("eventModal").style.display = "none";
+        // 2) skryjeme tlačítka v něm
+        document.getElementById("trainingActions").style.display = "none";
+
+        // 3) zapneme bulk-delete mód
+        aimedMode = true;
+        aimedSelections = [ window.selectedTrainingId ];
+
+        // zvýrazníme už první nakliknutý trénink
+        highlightAimedEvent(window.selectedTrainingId);
+
+        updateAimedUI();
+
+        // 4) otevřeme nový panel
+        aimedModal.style.display = "block";
+    });
+
+
+    // === Komplexní funkcionalita pro mazání vybraných tréninků (aimed) ===
+    function cancelAimed() {
+        aimedSelectionActive = false;
+        // odznačit lekce
+        calendar.getEvents().forEach(ev => {
+            if (ev._def.ui.classNames.includes("aimed-selected")) {
+                ev._def.ui.classNames = ev._def.ui.classNames.filter(c=>c!=="aimed-selected");
+                ev.remove();
+                calendar.addEvent(ev);
+            }
+        });
+        document.getElementById("aimedTrainingsModal").style.display = "none";
+        selectedAimed.clear();
+    }
+
+    // Potvrdit aimed mazání
+    aimedConfirmBtn.addEventListener("click", async () => {
+        // 1) Sestavíme správný tvar DTO
+        const payload = {
+            trainingDTOs: aimedSelections.map(id => ({ trainingId: id }))
+        };
+
+        // 2) Pošleme na správnou URL
+        const resp = await fetch(`${apiBase}/deleteAimedTrainingsChosenInOverview`, {
+            method: 'DELETE',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ trainingIds: aimedSelections  })
+        });
+
+        if (resp.ok) {
+            alert("Vybrané tréninky smazány");
+            closeAimed();
+            calendar.refetchEvents();
+        } else {
+            alert("Chyba při mazání: " + resp.status);
+        }
+    });
+
+    function updateAimedUI(){
+        aimedCountEl.textContent = aimedSelections.length;
+        aimedListEl.innerHTML = aimedSelections
+            .map(id => `<li>${id}</li>`)
+            .join("");
+        aimedConfirmBtn.disabled = aimedSelections.length === 0;
+    }
+
     calendar.render()
 
-    // Logout metoda
+
+    // === Vytvoření profilu nového admina - reakce na btn ===
+    document.getElementById("registrationAdminBtn").addEventListener("click", () => {
+
+        document.getElementById("registrationAdminModal").style.display = "block";
+    });
+
+
+
+    // === Logout metoda ===
     document.getElementById('logoutBtn').addEventListener('click', () => {
         fetch('/api/logoutAdmin', { method: 'POST' })
             .then(resp => {
                 if (resp.ok)
                     window.location.href = '/index.html';
-                else          alert('Odhlášení se nezdařilo');
+                else alert('Odhlášení se nezdařilo');
             })
             .catch(err => console.error('Logout error:', err));
     });

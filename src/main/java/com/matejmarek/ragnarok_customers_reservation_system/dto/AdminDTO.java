@@ -23,7 +23,7 @@ public class AdminDTO {
     private String nickname;
 
     @JsonProperty("isAdmin")
-    private boolean admin;
+    private boolean admin = true;
 
     @Size(min = 6, message = "Použij minimálně 6 znaků.")
     private String password;

@@ -29,7 +29,7 @@ public class AdminEntity implements UserDetails {
     private String nickname;
 
     @Column(nullable = false)
-    private boolean admin = false;
+    private boolean admin;
 
     @Column(nullable = false)
     private String password;
