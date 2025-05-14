@@ -1,0 +1,236 @@
+/* ==== Základní button styl ==== */
+button {
+    cursor: pointer;
+    font-family: inherit;
+}
+
+/* ==== FullCalendar: označení plné lekce červeným rámečkem ==== */
+.fc-event.full {
+    /* !important aby se přebilo defaultní FC stylem */
+    border: 2px solid red !important;
+}
+
+/* ==== Modal: stejný styl jako v index-adminPart.css ==== */
+.modal {
+    display: none;
+    position: fixed;
+    z-index: 1001;
+    padding-top: 60px;
+    left: 0; top: 0;
+    width: 100%; height: 100%;
+    overflow: auto;
+    background-color: rgba(0,0,0,0.5);
+}
+.modal-content {
+    background-color: #fff;
+    margin: auto;
+    padding: 20px;
+    border-radius: 6px;
+    width: 80%; max-width: 400px;
+}
+.close-button,
+.close-reservation-modal {
+    color: #aaa;
+    float: right;
+    font-size: 24px;
+    font-weight: bold;
+}
+.close-button:hover,
+.close-reservation-modal:hover {
+    color: #000;
+    cursor: pointer;
+}
+
+/* ==== Disabled tlačítko ==== */
+button.disabled {
+    opacity: 0.6;
+    pointer-events: none;
+}
+
+/* ==== Hláška o plné kapacitě ==== */
+#modal-message {
+    display: none;
+    color: red;
+    margin-top: 10px;
+    font-weight: bold;
+}
+
+
+/* kontejner loginu */
+.login-container {
+    position: relative;
+    width: 280px;
+    margin: 1rem 0 0 1rem;      /* pod kalendář, vlevo */
+}
+
+/* tlačítko Přihlásit */
+.login-toggle {
+    display: inline-block;
+    background: #007bff;
+    color: #fff;
+    border: none;
+    padding: 0.5rem 1rem;
+    font-size: 1rem;
+    cursor: pointer;
+    border-radius: 4px;
+}
+
+/* dropdown relativně vůči .login-container */
+.login-dropdown {
+    display: none;
+    position: absolute;
+    top: 100%;      /* těsně pod tlačítko */
+    left: 0;
+    width: 100%;
+    background-color: #fff;
+    box-shadow: 0 2px 6px rgba(0,0,0,0.2);
+    padding: 1rem;
+    border-radius: 4px;
+    z-index: 1000;
+}
+
+/* když je otevřeno */
+.login-dropdown.open {
+    display: block;
+}
+
+/* styl formuláře v dropdown */
+.login-dropdown form {
+    display: flex;
+    flex-direction: column;
+}
+.login-dropdown label {
+    margin-top: 0.5rem;
+}
+.login-dropdown input {
+    margin-top: 0.25rem;
+    padding: 0.25rem;
+}
+.login-dropdown button[type="submit"] {
+    margin-top: 1rem;
+    padding: 0.5rem;
+    background: #28a745;
+    color: #fff;
+    border: none;
+    border-radius: 4px;
+    cursor: pointer;
+}
+
+
+
+/* --- Transparentní eventy v týdenním/denním zobrazení, ale s viditelným textem --- */
+.fc .fc-timegrid-event {
+    background: transparent !important;   /* žádná plná výplň */
+    border: none !important;             /* žádný defaultní border */
+    color: #000 !important;              /* hlavní text černě */
+}
+
+/* Rámeček okolo eventu */
+.fc .fc-timegrid-event .fc-event-main-frame {
+    border: 1px solid #000 !important; /* tenký modrý rámeček */
+    background: transparent !important;   /* bez výplně */
+}
+
+/* Explicitně nastavit barvu názvu a času eventu */
+.fc .fc-timegrid-event .fc-event-time,
+.fc .fc-timegrid-event .fc-event-title {
+    color: #000 !important;               /* nebo jiná tmavá, dle chuti */
+    white-space: nowrap;                  /* aby se text nevytáčel do více řádků */
+    overflow: visible !important;         /* aby se text neodstínil */
+}
+ /*Tučný název lekce u týdenního a denního zobrazení*/
+.fc .fc-event-title {
+    font-weight: bold !important;
+}
+
+/* ----------------------------------------
+   1) Globální typografie a form-styly
+   ---------------------------------------- */
+body, input, button, select, textarea {
+    font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+    color: #333;
+}
+
+.modal-content h2,
+.modal-content h3,
+.modal-content h4 {
+    font-weight: 600;
+    margin-bottom: 0.5em;
+}
+
+.modal-content label {
+    display: block;
+    margin-top: 0.75em;
+    font-size: 0.95rem;
+}
+.modal-content input {
+    width: 100%;
+    padding: 0.5em;
+    margin-top: 0.25em;
+    border: 1px solid #ccc;
+    border-radius: 4px;
+    box-sizing: border-box;
+}
+
+.modal-content p,
+.modal-content ul {
+    margin: 0.75em 0;
+    line-height: 1.4;
+}
+.modal-content ul {
+    padding-left: 1.2em;
+}
+
+/* ----------------------------------------
+   2) Zaoblená, větší a barevně rozlišená tlačítka
+   ---------------------------------------- */
+/* univerzální styl pro tlačítka v modálních oknech */
+.modal-content button {
+    padding: 0.6em 1em;
+    font-size: 1rem;
+    border-radius: 6px;
+    border: none;
+    cursor: pointer;
+    margin: 0.5em 0;
+    width: 100%;
+    box-sizing: border-box;
+}
+
+/* světle zelené tlačítko pro uživatelskou rezervaci */
+#submitReservationBtn {
+    background-color: #90ee90;
+    color: #333;
+}
+
+#submitReservationBtn:hover {
+    background-color: #65c865;    /* světle zelené */
+}
+
+/* světle modré tlačítko pro rezervaci z eventModal */
+#createReservationBtn {
+    background-color: #bee3f8;
+    color: #333;
+}
+
+#createReservationBtn:hover {
+    background-color: #9fd6f6;
+}
+
+/* ----------------------------------------
+   3) Centrálni zarovnání tlačítek & form
+   ---------------------------------------- */
+.modal-content form {
+    text-align: center;
+}
+.modal-content form button {
+    max-width: 200px;
+    margin: 1em auto 0;
+}
+
+/* ----------------------------------------
+   4) Stín a zaoblení modálního okna
+   ---------------------------------------- */
+.modal-content {
+    border-radius: 8px;
+    box-shadow: 0 4px 12px rgba(0,0,0,0.15);
+}
