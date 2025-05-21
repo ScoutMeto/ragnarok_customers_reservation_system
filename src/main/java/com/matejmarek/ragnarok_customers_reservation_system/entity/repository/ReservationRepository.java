@@ -14,9 +14,16 @@ import java.util.List;
 public interface ReservationRepository extends JpaRepository<ReservationEntity, Long>, JpaSpecificationExecutor<ReservationEntity> {
     List<ReservationEntity> findByTraining_TrainingId(Long trainingId);
 
+//Verze pro přechod na PostgreSQL - nahraď tímto následující dotaz pod tímto komentářem
     @Modifying
-    @Transactional          // nebo na service-vrstvě
-    @Query("DELETE FROM reservations r WHERE r.reservationId = :id")
+    @Transactional
+    @Query(value = "DELETE FROM reservations WHERE reservation_id = :id", nativeQuery = true)
     int deleteByReservationIdJPQL(@Param("id") Long reservationId);
+
+    //Verze pro přechod na MySQL - nahraď tímto následující dotaz nad tímto komentářem
+//    @Modifying
+//    @Transactional          // nebo na service-vrstvě
+//    @Query("DELETE FROM reservations r WHERE r.reservationId = :id")
+//    int deleteByReservationIdJPQL(@Param("id") Long reservationId);
 }
 

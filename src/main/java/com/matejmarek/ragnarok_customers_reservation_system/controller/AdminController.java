@@ -14,7 +14,6 @@ import lombok.Setter;
 import lombok.Getter;
 
 import java.io.IOException;
-import java.security.Principal;
 
 @Setter
 @Getter

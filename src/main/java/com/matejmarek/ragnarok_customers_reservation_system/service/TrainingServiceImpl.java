@@ -1,6 +1,5 @@
 package com.matejmarek.ragnarok_customers_reservation_system.service;
 
-import com.matejmarek.ragnarok_customers_reservation_system.dto.AimedTrainingsRequestDTO;
 import com.matejmarek.ragnarok_customers_reservation_system.dto.ReservationDTO;
 import com.matejmarek.ragnarok_customers_reservation_system.dto.TrainingDTO;
 import com.matejmarek.ragnarok_customers_reservation_system.dto.TrainingResponseDTO;

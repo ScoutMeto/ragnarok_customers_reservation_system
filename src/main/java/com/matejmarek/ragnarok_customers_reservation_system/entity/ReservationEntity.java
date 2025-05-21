@@ -33,11 +33,8 @@ public class ReservationEntity {
     private int telephoneNumber;
 
     @JsonProperty("isAdmin")
-//    @Value ("false")
     private boolean admin = false;
 
-//    @Column(nullable = false)
-    @Max(8)
     private int numberOfBookedEntries;
 
     @Column(nullable = false)

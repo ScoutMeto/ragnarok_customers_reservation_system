@@ -4,13 +4,13 @@ button {
     font-family: inherit;
 }
 
-/* ==== FullCalendar: označení plné lekce červeným rámečkem ==== */
+/* ==== FullCalendar: označení plné lekce ==== */
 .fc-event.full {
     /* !important aby se přebilo defaultní FC stylem */
     border: 2px solid red !important;
 }
 
-/* ==== Modal: stejný styl jako v index-adminPart.css ==== */
+/* ==== Modal === */
 .modal {
     display: none;
     position: fixed;
@@ -125,26 +125,33 @@ button.disabled {
     color: #000 !important;              /* hlavní text černě */
 }
 
+.fc .fc-timegrid-event:hover {
+    background: #e1dfdf !important;   /* výplň */
+    border: none !important;             /* žádný defaultní border */
+    color: #000 !important;              /* hlavní text černě */
+}
+
 /* Rámeček okolo eventu */
 .fc .fc-timegrid-event .fc-event-main-frame {
     border: 1px solid #000 !important; /* tenký modrý rámeček */
-    background: transparent !important;   /* bez výplně */
+    /*background: transparent !important;   !* bez výplně *!*/
+    background: transparent !important;
 }
 
 /* Explicitně nastavit barvu názvu a času eventu */
 .fc .fc-timegrid-event .fc-event-time,
 .fc .fc-timegrid-event .fc-event-title {
-    color: #000 !important;               /* nebo jiná tmavá, dle chuti */
-    white-space: nowrap;                  /* aby se text nevytáčel do více řádků */
-    overflow: visible !important;         /* aby se text neodstínil */
+    color: #000 !important;
+    white-space: nowrap;                  /* nevytáčet text do více řádků */
+    overflow: visible !important;         /* neodstínit text */
 }
- /*Tučný název lekce u týdenního a denního zobrazení*/
+ /* Tučný název lekce u týdenního a denního zobrazení */
 .fc .fc-event-title {
     font-weight: bold !important;
 }
 
 /* ----------------------------------------
-   1) Globální typografie a form-styly
+   Globální typografie a form-styly
    ---------------------------------------- */
 body, input, button, select, textarea {
     font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
@@ -182,7 +189,7 @@ body, input, button, select, textarea {
 }
 
 /* ----------------------------------------
-   2) Zaoblená, větší a barevně rozlišená tlačítka
+   Zaoblená, větší a barevně rozlišená tlačítka
    ---------------------------------------- */
 /* univerzální styl pro tlačítka v modálních oknech */
 .modal-content button {
@@ -217,7 +224,7 @@ body, input, button, select, textarea {
 }
 
 /* ----------------------------------------
-   3) Centrálni zarovnání tlačítek & form
+   Centrálni zarovnání tlačítek & form
    ---------------------------------------- */
 .modal-content form {
     text-align: center;
@@ -228,7 +235,7 @@ body, input, button, select, textarea {
 }
 
 /* ----------------------------------------
-   4) Stín a zaoblení modálního okna
+   Stín a zaoblení modálního okna
    ---------------------------------------- */
 .modal-content {
     border-radius: 8px;

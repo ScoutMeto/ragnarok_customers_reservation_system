@@ -6,8 +6,8 @@ document.addEventListener("DOMContentLoaded", function () {
     //responzivní design
     function getResponsiveView() {
         const width = window.innerWidth;
-        // if (width < 600) return 'timeGridDay';          // mobil
-        if (width < 1024) return 'timeGridDay';      // tablet / menší notebook
+        // if (width < 600) return 'timeGridDay';          // mobil - ponecháno pro případ potřeby
+        if (width < 1024) return 'timeGridDay';      // tablet / menší notebook / mobil
         return 'dayGridMonth';                        // velká obrazovka
     }
 
@@ -22,6 +22,14 @@ document.addEventListener("DOMContentLoaded", function () {
             center: "title",
             right: "dayGridMonth,timeGridWeek,timeGridDay"
         },
+
+        // formát času u eventů při měsíčním zobrazení
+        eventTimeFormat: {
+            hour:   'numeric',   // "0", "1", … "23"
+            minute: '2-digit',   // "00", "05", "30", …
+            hour12: false        // 24h formát
+        },
+
         // Výchozí nastavení času (scroll)
         scrollTime: "16:00:00",
 

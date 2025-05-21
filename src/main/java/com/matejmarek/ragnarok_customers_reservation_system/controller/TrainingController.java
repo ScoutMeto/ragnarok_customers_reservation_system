@@ -62,7 +62,7 @@ public class TrainingController {
         System.out.println("Požadavek na načtení jednoho vybraného tréninků (TrainingController, getOneTraining");
 
         /*
-        Přidat metodu, která nalézá všechny rezervace podle ID a vkládá je do Listu k TrainingEntity
+        Nalézá všechny rezervace podle ID a vkládá je do Listu k TrainingEntity
         (použito pro přehled: kdo je přihlášen na trénink, kolik míst je obsazených)
          -vyřešeno načítáním EAGER
          */

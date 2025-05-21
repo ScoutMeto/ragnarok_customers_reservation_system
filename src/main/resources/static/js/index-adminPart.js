@@ -54,6 +54,17 @@ document.addEventListener("DOMContentLoaded", function () {
             center: 'title',
             right: 'dayGridMonth,timeGridWeek,timeGridDay'
         },
+
+        // formát času u eventů při měsíčním zobrazení
+        eventTimeFormat: {
+            hour:   'numeric',   // "0", "1", … "23"
+            minute: '2-digit',   // "00", "05", "30", …
+            hour12: false        // 24h formát
+        },
+
+        // Výchozí nastavení času (scroll)
+        scrollTime: "16:00:00",
+
         buttonText: {
             today: 'dnes',
             month: 'měsíc',
@@ -300,6 +311,7 @@ document.addEventListener("DOMContentLoaded", function () {
         if (response.ok) {
             alert('Rezervace vytvořena');
             document.getElementById("reservationModal").style.display = "none";
+            document.getElementById("eventModal").style.display = "none";
             calendar.refetchEvents(); // obnoví kalendář
         } else {
             alert('Chyba při vytváření rezervace');
@@ -326,6 +338,7 @@ document.addEventListener("DOMContentLoaded", function () {
             if (response.ok) {
                 alert("Trénink úspěšně smazán.");
                 document.getElementById("reservationModal").style.display = "none";
+                document.getElementById("eventModal").style.display = "none";
                 calendar.refetchEvents(); // aktualizace FullCalendaru
             } else {
                 alert("Chyba při mazání tréninku.");
@@ -379,6 +392,7 @@ document.addEventListener("DOMContentLoaded", function () {
             if (response.ok) {
                 alert(editMode === "single" ? "Trénink upraven." : "Série tréninků upravena.");
                 document.getElementById("editTrainingModal").style.display = "none";
+                document.getElementById("eventModal").style.display = "none";
                 calendar.refetchEvents();
             } else {
                 alert("Chyba při úpravě " + (editMode === "single" ? "tréninku." : "série."));
@@ -463,6 +477,15 @@ document.addEventListener("DOMContentLoaded", function () {
     // === Úprava série tréninků - reakce na btn ===
     document.getElementById("editTrainingsSeriesBtn").addEventListener("click", () => {
         editMode = "series";
+
+        const data = window.selectedTrainingData || {};
+
+        document.getElementById("editNameOfLesson").value = data.lessonName || "";
+        document.getElementById("editCoachName").value = data.coachName || "";
+        document.getElementById("editStartOfCurrentLesson").value = data.start ? new Date(data.start).toISOString().slice(0,16) : "";
+        document.getElementById("editEndOfCurrentLesson").value = data.end ? new Date(data.end).toISOString().slice(0,16) : "";
+        document.getElementById("editCapacity").value = data.capacity || "";
+
         document.getElementById("editTrainingId").value = window.selectedTrainingId;
         document.getElementById("editTrainingModal").style.display = "block";
     });
