@@ -43,7 +43,15 @@ public class ApplicationSecurityConfiguration {
                         .requestMatchers("/api/**").hasRole("ADMIN")
                         .anyRequest().authenticated()
                 )
-                .formLogin(form -> form.disable()) // zcela vypnout přesměrování na /login
+                .formLogin(form -> form
+                        .loginProcessingUrl("/api/loginAdmin")
+                        .successHandler((req, res, auth) -> res.setStatus(200))
+                        .failureHandler((req, res, ex) -> res.setStatus(401))
+                        .permitAll()
+                )
+//                varianta pro vývoj
+//                .formLogin(form -> form.disable()) // zcela vypnout přesměrování na /login
+//
                 .logout(logout -> logout
                         .logoutRequestMatcher(new AntPathRequestMatcher("/api/logoutAdmin"))
                         .logoutSuccessUrl("/index.html").permitAll()
