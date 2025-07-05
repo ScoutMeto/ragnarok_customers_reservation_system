@@ -150,16 +150,25 @@ document.addEventListener("DOMContentLoaded", function () {
             });
 
             if (resp.ok) {
-                setTimeout(() => {
+                showToast("Rezervace úspěšně vytvořena.");
                 alert("Rezervace úspěšně vytvořena.");
                 document.getElementById("reservationModal").style.display = "none";
                 document.getElementById("eventModal").style.display = "none";
                 calendar.refetchEvents();
-                }, 100)
             } else {
                 alert("Chyba při vytváření rezervace.");
             }
         });
+
+    //Hlášky místo "alert" kvůli mobilním prohlížečům
+    function showToast(message) {
+        const toast = document.getElementById("toast");
+        toast.textContent = message;
+        toast.style.display = "block";
+        setTimeout(() => {
+            toast.style.display = "none";
+        }, 3000);
+    }
 
     calendar.render();
 
