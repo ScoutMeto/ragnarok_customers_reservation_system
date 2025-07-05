@@ -525,6 +525,7 @@ background-color: #9fd6f6;
 
 /*označ den, když je v něm nějaký event*/
 .fc-day-has-more {
-    background-color: rgba(253, 212, 6, 0.2); /* žlutá */
+    border-color: rgba(6, 27, 253, 0.2); /* žlutá */
+    border-width: thick;
 }
 
