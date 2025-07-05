@@ -56,7 +56,7 @@ document.addEventListener("DOMContentLoaded", function () {
         },
 
         moreLinkText: function(n) {     //mnoho lekcí k zobrazení v kalendáři - český přepis oznámení
-            return `+${n} další`;
+            return `+${n}`;
         },
         noEventsText: 'Žádné lekce',        //žádné lekce - pro zobrazení listWeek; český přepis
         navLinks: true, // can click day/week names to navigate views
