@@ -203,7 +203,7 @@ document.addEventListener("DOMContentLoaded", function () {
             const endInput = document.getElementById("endOfCurrentLesson");
 
             const clickedDate = new Date(info.dateStr);
-            clickedDate.setHours(clickedDate.getHours() + 1);
+            clickedDate.setHours(clickedDate.getHours() + 2);
             const defaultEnd = new Date(clickedDate);
             defaultEnd.setHours(clickedDate.getHours() + 1);
 
