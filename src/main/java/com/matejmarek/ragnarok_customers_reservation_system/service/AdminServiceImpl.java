@@ -76,7 +76,7 @@ public UserDetails loadUserByUsername(String adminEmail) throws UsernameNotFound
     public void logoutAdmin(HttpServletRequest request, HttpServletResponse response)
             throws ServletException, IOException {
         request.logout();
-        response.sendRedirect("/index.html");
+        response.sendRedirect("https://ragnarokcustomersreservationsystem-production.up.railway.app/index.html");
     }
 
     @Override
