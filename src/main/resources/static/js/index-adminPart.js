@@ -113,6 +113,16 @@ document.addEventListener("DOMContentLoaded", function () {
                               }
                         }
                     }
+
+            // Pokud je v daný den event, je den barevně označen
+            const parentCell = info.el.closest(".fc-daygrid-day");
+            if (parentCell) {
+                const events = parentCell.querySelectorAll(".fc-daygrid-event");
+                const moreLink = parentCell.querySelector(".fc-daygrid-more-link");
+                if (moreLink || events.length > 0) {
+                    parentCell.classList.add("fc-day-has-more");
+                }
+            }
         },
 
         // Modální okno po kliknutí na lekci

@@ -24,7 +24,7 @@ document.addEventListener("DOMContentLoaded", function () {
         },
 
         moreLinkText: function(n) {     //mnoho lekcí k zobrazení v kalendáři - český přepis oznámení
-            return `+${n}`;
+            return ``;
         },
         noEventsText: 'Žádné lekce',        //žádné lekce - pro zobrazení listWeek; český přepis
         navLinks: true, // can click day/week names to navigate views
@@ -64,6 +64,17 @@ document.addEventListener("DOMContentLoaded", function () {
             if (props.numberOfReservations >= props.numberOfFreeSlots) {
                 info.el.classList.add("full");
             }
+
+            // Pokud je v daný den event, je den barevně označen
+            const parentCell = info.el.closest(".fc-daygrid-day");
+            if (parentCell) {
+                const events = parentCell.querySelectorAll(".fc-daygrid-event");
+                const moreLink = parentCell.querySelector(".fc-daygrid-more-link");
+                if (moreLink || events.length > 0) {
+                    parentCell.classList.add("fc-day-has-more");
+                }
+            }
+
         },
 
         eventClick: function (info) {

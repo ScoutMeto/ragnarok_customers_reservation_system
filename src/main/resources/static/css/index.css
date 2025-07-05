@@ -329,3 +329,8 @@ automatická výška calendar skrz celou výšku obrazovky zařízení
     opacity: 0.95;
     box-shadow: 0 4px 8px rgba(0,0,0,0.2);
 }
+
+/*označ den, když je v něm nějaký event*/
+.fc-day-has-more {
+    background-color: rgba(253, 212, 6, 0.2); /* žlutá */
+}
