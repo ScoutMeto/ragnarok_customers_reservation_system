@@ -43,7 +43,7 @@ document.addEventListener("DOMContentLoaded", function () {
         allDayText: "celý den",
 
         buttonText: {
-            today: 'dnes',
+            today: 'aktuálně',
             month: 'měsíc',
             // week:  'týden',
             // day:   'den',

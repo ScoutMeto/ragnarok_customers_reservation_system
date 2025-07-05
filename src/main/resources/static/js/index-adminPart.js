@@ -75,7 +75,7 @@ document.addEventListener("DOMContentLoaded", function () {
         allDayText: "celý den",
 
         buttonText: {
-            today: 'dnes',
+            today: 'aktuálně',
             month: 'měsíc',
             week:  'týden1',
             // day:   'den',
@@ -204,7 +204,7 @@ document.addEventListener("DOMContentLoaded", function () {
 
             const clickedDate = new Date(info.dateStr);
             const defaultEnd = new Date(clickedDate);
-            defaultEnd.setHours(clickedDate.getHours() + 1);
+            defaultEnd.setHours(clickedDate.getHours() + 2); //+2 hodiny kvůli časovému pásmu oproti běžícímu serveru (?)
 
             startInput.value = clickedDate.toISOString().slice(0, 16); // yyyy-MM-ddTHH:mm
             endInput.value = defaultEnd.toISOString().slice(0, 16);
@@ -660,9 +660,8 @@ document.addEventListener("DOMContentLoaded", function () {
             .then(resp => {
                 if (resp.ok)
                     window.location.href = '/index.html';
-                else
-                    showToast("Odhlášení se nezdařilo.");
-                    alert('Odhlášení se nezdařilo');
+                else alert('Odhlášení se nezdařilo.');
+                    showToast("Odhlášení se nezdařilo (toast)");
             })
             .catch(err => console.error('Logout error:', err));
     });
