@@ -6,7 +6,7 @@ document.addEventListener("DOMContentLoaded", function () {
     function getResponsiveView() {
         const width = window.innerWidth;
         // if (width < 600) return 'timeGridDay';          // mobil
-        if (width < 1024) return 'timeGridDay';      // tablet / menší notebook
+        if (width < 1024) return 'listWeek';      // tablet / menší notebook / mobil
         return 'dayGridMonth';                        // velká obrazovka
     }
 
@@ -52,8 +52,15 @@ document.addEventListener("DOMContentLoaded", function () {
         headerToolbar: {
             left: 'prev,next today',
             center: 'title',
-            right: 'dayGridMonth,timeGridWeek,timeGridDay'
+            right: 'dayGridMonth,timeGridWeek,listWeek'
         },
+
+        moreLinkText: function(n) {     //mnoho lekcí k zobrazení v kalendáři - český přepis oznámení
+            return `+${n} další`;
+        },
+        noEventsText: 'Žádné lekce',        //žádné lekce - pro zobrazení listWeek; český přepis
+        navLinks: true, // can click day/week names to navigate views
+        dayMaxEvents: true, // allow "more" link when too many events
 
         // formát času u eventů při měsíčním zobrazení
         eventTimeFormat: {
@@ -65,12 +72,18 @@ document.addEventListener("DOMContentLoaded", function () {
         // Výchozí nastavení času (scroll)
         scrollTime: "16:00:00",
 
+        allDayText: "celý den",
+
         buttonText: {
             today: 'dnes',
             month: 'měsíc',
-            week:  'týden',
-            day:   'den'
+            week:  'týden1',
+            // day:   'den',
+            list:  'týden2'
         },
+
+        // height: "100%",
+
         events: {
             url: '/api/loadAllTrainings',
             method: 'GET',
@@ -103,6 +116,11 @@ document.addEventListener("DOMContentLoaded", function () {
 
         // Modální okno po kliknutí na lekci
         eventClick: function (info) {
+
+            document.querySelectorAll('.fc-popover').forEach(node => {
+                node.remove();
+            });
+
             const width = window.innerWidth; // if (width < 1024) { // zobrazit modal na mobilu / tabletu
 
             // pokud jsme v bulk-delete módu, jen sbíráme ID a exit

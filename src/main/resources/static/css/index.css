@@ -7,7 +7,7 @@ button {
 /* ==== FullCalendar: označení plné lekce ==== */
 .fc-event.full {
     /* !important aby se přebilo defaultní FC stylem */
-    border: 2px solid red !important;
+    background-color: rgba(207, 90, 90, 0.72) !important;
 }
 
 /* ==== Modal === */
@@ -24,9 +24,11 @@ button {
 .modal-content {
     background-color: #fff;
     margin: auto;
+    margin-bottom: 40px;
     padding: 20px;
     border-radius: 6px;
-    width: 80%; max-width: 400px;
+    width: 80%;
+    max-width: 400px;
 }
 .close-button,
 .close-reservation-modal {
@@ -133,7 +135,7 @@ button.disabled {
 
 /* Rámeček okolo eventu */
 .fc .fc-timegrid-event .fc-event-main-frame {
-    border: 1px solid #000 !important; /* tenký modrý rámeček */
+    border: 1px solid #000 !important; /* tenký černý rámeček */
     /*background: transparent !important;   !* bez výplně *!*/
     background: transparent !important;
 }
@@ -240,4 +242,74 @@ body, input, button, select, textarea {
 .modal-content {
     border-radius: 8px;
     box-shadow: 0 4px 12px rgba(0,0,0,0.15);
+}
+
+/* ----------------------------------------------
+automatická výška calendar skrz celou výšku obrazovky zařízení
+   ---------------------------------------------- */
+/*html,*/
+/*body {*/
+/*    margin: 10px;*/
+/*    padding: 0;*/
+/*    height: auto;*/
+/*}*/
+
+/*#calendar {*/
+    /* Pokud je #calendar přímo potomkem <body>,
+       nastavíme ho na 100% výšku.
+       Pokud je nadřazený DIV, musí i ten mít height: 100%; */
+/*    height: 100%;*/
+/*    margin: 0 auto;*/
+/*}*/
+
+
+
+/*zobrazení možností nad kalendářem v řádcích nad sebou*/
+/*@media(max-width: 600px) {*/
+/*    .fc-toolbar.fc-header-toolbar {*/
+/*        display: flex;*/
+/*        flex-direction: column;*/
+/*    }*/
+/*    .fc-toolbar.fc-header-toolbar .fc-toolbar-chunk:nth-child(1) {*/
+/*        order: 3;*/
+/*    }*/
+/*    .fc-toolbar.fc-header-toolbar .fc-toolbar-chunk:nth-child(2) {*/
+/*        order: 1;*/
+/*    }*/
+/*    .fc-toolbar.fc-header-toolbar .fc-toolbar-chunk:nth-child(3) {*/
+/*        order: 2;*/
+/*    }*/
+/*}*/
+
+/*nebo varianta 2*/
+@media(max-width: 600px) {
+    /* 1) _Kontejner_: použijeme flex + wrap (nikoli flex-direction: column) */
+    .fc .fc-header-toolbar {
+        display: flex !important;
+        flex-wrap: wrap !important;
+        justify-content: center;        /* vycentruje oba řádky doprostřed */
+        align-items: center;
+    }
+
+    /* 2) Levý chunk (navigace ← →, dnešek) – zůstanou v prvním řádku, order 1 */
+    .fc-toolbar.fc-header-toolbar .fc-toolbar-chunk:nth-child(1) {
+        order: 2;            /* první (vlevo) */
+        flex: 1 0 auto;      /* zabere tolik místa, kolik potřebuje + dovolí ostatnímu chunku vedle sebe */
+        text-align: left;    /* tlačítka vlevo od sebe */
+    }
+
+    /* 3) Pravý chunk (měsíc, týden, den) – zůstane vedle levého v prvním řádku, order 2 */
+    .fc-toolbar.fc-header-toolbar .fc-toolbar-chunk:nth-child(3) {
+        order: 3;            /* druhý vedle levého */
+        flex: 1 0 auto;      /* zabere tolik místa, kolik potřebuje */
+        text-align: right;   /* tlačítka napravo od sebe */
+    }
+
+    /* 4) Střední chunk (vlastní název -> „26. 5. – 1. 6. 2025“) – umístí se pod první řádek, order 3 */
+    .fc-toolbar.fc-header-toolbar .fc-toolbar-chunk:nth-child(2) {
+        order: 1;            /* až jako třetí řádek */
+        flex: 1 0 100%;      /* zabere celou šířku (100%) – proto se zalomí pod řádek s tlačítky */
+        text-align: center;
+        margin-top: 4px;     /* malá mezera nad tímto řádkem */
+    }
 }
