@@ -203,8 +203,9 @@ document.addEventListener("DOMContentLoaded", function () {
             const endInput = document.getElementById("endOfCurrentLesson");
 
             const clickedDate = new Date(info.dateStr);
+            clickedDate.setHours(clickedDate.getHours() + 1);
             const defaultEnd = new Date(clickedDate);
-            defaultEnd.setHours(clickedDate.getHours() + 2); //+2 hodiny kvůli časovému pásmu oproti běžícímu serveru (?)
+            defaultEnd.setHours(clickedDate.getHours() + 1);
 
             startInput.value = clickedDate.toISOString().slice(0, 16); // yyyy-MM-ddTHH:mm
             endInput.value = defaultEnd.toISOString().slice(0, 16);
@@ -661,7 +662,6 @@ document.addEventListener("DOMContentLoaded", function () {
                 if (resp.ok)
                     window.location.href = '/index.html';
                 else alert('Odhlášení se nezdařilo.');
-                    showToast("Odhlášení se nezdařilo (toast)");
             })
             .catch(err => console.error('Logout error:', err));
     });
