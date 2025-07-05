@@ -150,10 +150,12 @@ document.addEventListener("DOMContentLoaded", function () {
             });
 
             if (resp.ok) {
+                setTimeout(() => {
                 alert("Rezervace úspěšně vytvořena.");
                 document.getElementById("reservationModal").style.display = "none";
                 document.getElementById("eventModal").style.display = "none";
                 calendar.refetchEvents();
+                }, 100)
             } else {
                 alert("Chyba při vytváření rezervace.");
             }
