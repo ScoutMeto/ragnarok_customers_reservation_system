@@ -332,6 +332,6 @@ automatická výška calendar skrz celou výšku obrazovky zařízení
 
 /*označ den, když je v něm nějaký event*/
 .fc-day-has-more {
-    border-color: rgba(6, 27, 253, 0.2); /* žlutá */
-    border-width: thick;
+    border-color: rgba(6, 27, 253, 0.2); /* modré ohraničení */
+    border-width: 1px;
 }
