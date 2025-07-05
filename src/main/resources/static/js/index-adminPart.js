@@ -88,6 +88,7 @@ document.addEventListener("DOMContentLoaded", function () {
             url: '/api/loadAllTrainings',
             method: 'GET',
             failure: function() {
+                showToast("Chyba při načítání tréninků (calendar)!");
                 alert('Chyba při načítání tréninků (calendar)!');
             }
         },
@@ -299,11 +300,13 @@ document.addEventListener("DOMContentLoaded", function () {
         });
 
         if (response.ok) {
-            alert('Trénink vytvořen');
+            showToast("Trénink vytvořen.");
+            alert('Trénink vytvořen.');
             document.getElementById("trainingModal").style.display = "none";
             calendar.refetchEvents();  // ← Zde obnovíš kalendář s novým tréninkem
         } else {
-            alert('Chyba při vytváření tréninku');
+            showToast("Chyba při vytváření tréninku.");
+            alert('Chyba při vytváření tréninku.');
         }
     });
 
@@ -341,6 +344,7 @@ document.addEventListener("DOMContentLoaded", function () {
         const trainingId = window.selectedTrainingId;
 
         if (!trainingId) {
+            showToast("Nebyl vybrán žádný trénink k odstranění.");
             alert("Nebyl vybrán žádný trénink k odstranění.");
             return;
         }
@@ -354,15 +358,18 @@ document.addEventListener("DOMContentLoaded", function () {
             });
 
             if (response.ok) {
+                showToast("Trénink úspěšně smazán.");
                 alert("Trénink úspěšně smazán.");
                 document.getElementById("reservationModal").style.display = "none";
                 document.getElementById("eventModal").style.display = "none";
                 calendar.refetchEvents(); // aktualizace FullCalendaru
             } else {
+                showToast("Chyba při mazání tréninku.");
                 alert("Chyba při mazání tréninku.");
             }
         } catch (error) {
             console.error("Chyba při komunikaci s backendem:", error);
+            showToast("Došlo k chybě při mazání.");
             alert("Došlo k chybě při mazání.");
         }
     });
@@ -408,15 +415,18 @@ document.addEventListener("DOMContentLoaded", function () {
             });
 
             if (response.ok) {
+                showToast("Úprava proběhla úspěšně.");
                 alert(editMode === "single" ? "Trénink upraven." : "Série tréninků upravena.");
                 document.getElementById("editTrainingModal").style.display = "none";
                 document.getElementById("eventModal").style.display = "none";
                 calendar.refetchEvents();
             } else {
+                showToast("Chyba při úpravě.");
                 alert("Chyba při úpravě " + (editMode === "single" ? "tréninku." : "série."));
             }
         } catch (error) {
             console.error("Chyba při odeslání:", error);
+            showToast("Nastala chyba při komunikaci se serverem.");
             alert("Nastala chyba při komunikaci se serverem.");
         }
     });
@@ -441,12 +451,14 @@ document.addEventListener("DOMContentLoaded", function () {
         });
 
         if (response.ok) {
-            alert('Rezervace upravena');
+            showToast("Rezervace upravena.");
+            alert('Rezervace upravena.');
             document.getElementById("reservationEditModal").style.display = "none";
             document.getElementById("eventModal").style.display = "none";
             calendar.refetchEvents();
         } else {
-            alert('Chyba při úpravě rezervace');
+            showToast("Chyba při úpravě rezervace.");
+            alert('Chyba při úpravě rezervace.');
         }
     });
 
@@ -467,10 +479,12 @@ document.addEventListener("DOMContentLoaded", function () {
         });
 
         if (response.ok) {
+            showToast("Profil nového admina vytvořen.");
             alert('Profil nového admina vytvořen.');
             document.getElementById("registrationAdminModal").style.display = "none";
             calendar.refetchEvents(); // obnoví kalendář
         } else {
+            showToast("Chyba při vytváření profilu admina.");
             alert('Chyba při vytváření profilu admina.');
         }
     });
@@ -546,10 +560,12 @@ document.addEventListener("DOMContentLoaded", function () {
                 });
 
                 if (response.ok) {
+                    showToast("Rezervace smazána.");
                     alert('Rezervace smazána.');
                     calendar.refetchEvents();
                     document.getElementById('eventModal').style.display = 'none';
                 } else {
+                    showToast("Chyba při mazání rezervace.");
                     alert('Chyba při mazání rezervace.');
                 }
             } catch (error) {
@@ -609,10 +625,12 @@ document.addEventListener("DOMContentLoaded", function () {
         });
 
         if (resp.ok) {
-            alert("Vybrané tréninky smazány");
+            showToast("Vybrané tréninky smazány.");
+            alert("Vybrané tréninky smazány.");
             closeAimed();
             calendar.refetchEvents();
         } else {
+            showToast("Chyba při mazání.");
             alert("Chyba při mazání: " + resp.status);
         }
     });
@@ -642,10 +660,22 @@ document.addEventListener("DOMContentLoaded", function () {
             .then(resp => {
                 if (resp.ok)
                     window.location.href = '/index.html';
-                else alert('Odhlášení se nezdařilo');
+                else
+                    showToast("Odhlášení se nezdařilo.");
+                    alert('Odhlášení se nezdařilo');
             })
             .catch(err => console.error('Logout error:', err));
     });
 
 });
+
+//Hlášky místo "alert" kvůli mobilním prohlížečům
+function showToast(message) {
+    const toast = document.getElementById("toast");
+    toast.textContent = message;
+    toast.style.display = "block";
+    setTimeout(() => {
+        toast.style.display = "none";
+    }, 3000);
+}
 

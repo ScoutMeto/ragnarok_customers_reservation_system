@@ -130,6 +130,7 @@ document.addEventListener("DOMContentLoaded", function () {
             const available = capacity - booked;
 
             if (requested > available) {
+                showToast("Maximálně lze rezervovat" + available + "míst.");
                 alert(`Maximálně lze rezervovat ${available} míst.`);
                 return;
             }
@@ -156,19 +157,10 @@ document.addEventListener("DOMContentLoaded", function () {
                 document.getElementById("eventModal").style.display = "none";
                 calendar.refetchEvents();
             } else {
+                showToast("Chyba při vytváření rezervace.");
                 alert("Chyba při vytváření rezervace.");
             }
         });
-
-    //Hlášky místo "alert" kvůli mobilním prohlížečům
-    function showToast(message) {
-        const toast = document.getElementById("toast");
-        toast.textContent = message;
-        toast.style.display = "block";
-        setTimeout(() => {
-            toast.style.display = "none";
-        }, 3000);
-    }
 
     calendar.render();
 
@@ -205,6 +197,17 @@ async function login() {
     if (res.ok) {
         window.location.href = '/index-adminPart.html';
     } else {
+        showToast("Přihlášení selhalo.");
         alert('Přihlášení selhalo');
     }
+}
+
+//Hlášky místo "alert" kvůli mobilním prohlížečům
+function showToast(message) {
+    const toast = document.getElementById("toast");
+    toast.textContent = message;
+    toast.style.display = "block";
+    setTimeout(() => {
+        toast.style.display = "none";
+    }, 3000);
 }
