@@ -76,7 +76,7 @@ public class TrainingServiceImpl implements TrainingService {
             repeatedEntity.setStartOfCurrentLesson(nextDate);
             repeatedEntity.setEndOfCurrentLesson(
                     nextDate.plusHours(
-                            modelLesson.getEndOfCurrentLesson().getHour() - modelLesson.getStartOfCurrentLesson().getHour() + 1
+                            modelLesson.getEndOfCurrentLesson().getHour() - modelLesson.getStartOfCurrentLesson().getHour()
                     )
             );
 
