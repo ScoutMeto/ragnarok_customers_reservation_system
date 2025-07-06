@@ -26,7 +26,7 @@ public class ReservationEntity {
     @Column(nullable = false)
     private String secondName;
 
-    @Column(nullable = false)
+//    @Column(nullable = false) - nepovinný údaj
     private String userEmail;
 
     @Column(nullable = false)
