@@ -48,6 +48,7 @@ public class ApplicationSecurityConfiguration {
                         .logoutRequestMatcher(new AntPathRequestMatcher("/api/logoutAdmin"))
                         .logoutSuccessUrl("/index.html").permitAll()
                 )
+                .sessionManagement(session -> session.maximumSessions(10))
                 .exceptionHandling(ex -> ex
                         .authenticationEntryPoint(new LoginUrlAuthenticationEntryPoint("/index.html"))
                         .accessDeniedHandler((req, res, exc) -> res.sendRedirect("/index.html"))
