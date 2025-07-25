@@ -484,19 +484,39 @@ background-color: #9fd6f6;
         align-items: center;
     }
 
+    /***** VARIANTA, KDYŽ CHCI MÍT 2 A 3 VEDLE SEBE NA JEDNOM ŘÁDKU *****/
     /* 2) Levý chunk (navigace ← →, dnešek) – zůstanou v prvním řádku, order 1 */
-    .fc-toolbar.fc-header-toolbar .fc-toolbar-chunk:nth-child(1) {
-        order: 2;            /* první (vlevo) */
-        flex: 1 0 auto;      /* zabere tolik místa, kolik potřebuje + dovolí ostatnímu chunku vedle sebe */
-        text-align: left;    /* tlačítka vlevo od sebe */
-    }
+    /*.fc-toolbar.fc-header-toolbar .fc-toolbar-chunk:nth-child(1) {*/
+    /*    order: 2;            !* první (vlevo) *!*/
+    /*    flex: 1 0 auto;      !* zabere tolik místa, kolik potřebuje + dovolí ostatnímu chunku vedle sebe *!*/
+    /*    text-align: left;    !* tlačítka vlevo od sebe *!*/
+    /*}*/
 
     /* 3) Pravý chunk (měsíc, týden, den) – zůstane vedle levého v prvním řádku, order 2 */
+    /*.fc-toolbar.fc-header-toolbar .fc-toolbar-chunk:nth-child(3) {*/
+    /*    order: 3;            !* druhý vedle levého *!*/
+    /*    flex: 1 0 auto;      !* zabere tolik místa, kolik potřebuje *!*/
+    /*    text-align: right;   !* tlačítka napravo od sebe *!*/
+    /*}*/
+    /***********************************/
+
+    /***** VARIANTA 2 A 3 POD SEBOU KVŮLI MALÉMU DISPLAYI TELEFONU *****/
+     /*2) Levý chunk (navigace ← →, dnešek) – zůstanou v prvním řádku, order 1 */
+    .fc-toolbar.fc-header-toolbar .fc-toolbar-chunk:nth-child(1) {
+        order: 2;            /* první (vlevo) */
+        flex: 1 0 100%;      /* zabere celou šířku (100%) – proto se zalomí pod řádek s tlačítky */
+        text-align: center;
+        margin-top: 4px;     /* malá mezera nad tímto řádkem */
+    }
+
+     /*3) Pravý chunk (měsíc, týden, den) – zůstane vedle levého v prvním řádku, order 2 */
     .fc-toolbar.fc-header-toolbar .fc-toolbar-chunk:nth-child(3) {
         order: 3;            /* druhý vedle levého */
-        flex: 1 0 auto;      /* zabere tolik místa, kolik potřebuje */
-        text-align: right;   /* tlačítka napravo od sebe */
+        flex: 1 0 100%;      /* zabere celou šířku (100%) – proto se zalomí pod řádek s tlačítky */
+        text-align: center;
+        margin-top: 4px;     /* malá mezera nad tímto řádkem */
     }
+    /***********************************/
 
     /* 4) Střední chunk (vlastní název -> „26. 5. – 1. 6. 2025“) – umístí se pod první řádek, order 3 */
     .fc-toolbar.fc-header-toolbar .fc-toolbar-chunk:nth-child(2) {
