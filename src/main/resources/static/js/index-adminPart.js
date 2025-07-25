@@ -52,7 +52,7 @@ document.addEventListener("DOMContentLoaded", function () {
         headerToolbar: {
             left: 'prev,next today',
             center: 'title',
-            right: 'dayGridMonth,timeGridWeek,listWeek'
+            right: 'dayGridMonth,listWeek'
         },
 
         moreLinkText: function(n) {     //mnoho lekcí k zobrazení v kalendáři - český přepis oznámení
