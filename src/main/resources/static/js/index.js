@@ -103,6 +103,34 @@ document.addEventListener("DOMContentLoaded", function () {
                 msg.style.display = "none";
             }
 
+            // Načti rezervace s neúplnými info oproti adminitrátorskému přístupu
+            const reservations = props.reservations || [];
+
+            const listContainer = document.getElementById("reservationsContainer");
+            listContainer.innerHTML = ""; // reset
+
+            if (reservations.length === 0) {
+                listContainer.innerHTML = "<i>Žádné rezervace</i>";
+            }
+
+            reservations.forEach(res => {
+                const li = document.createElement("li");
+                const shortSecondName = res.secondName ? res.secondName.charAt(0) + '.' : '';
+                li.textContent = `${res.firstName} ${shortSecondName}, ${res.numberOfBookedEntries} (počet osob)`;
+                li.style.cursor = "pointer";
+                li.addEventListener("click", () => {
+                    window.selectedReservationId = res.reservation_id; // ID rezervace globálně dostupné
+                    window.selectedReservationData = res;             // Data celého objektu rezervace globálně dostupné
+
+                    console.log("Vybrané ID rezervace:", window.selectedReservationId);
+
+                    // Otevřeme vlastní modal s volbou
+                    document.getElementById('reservationOptionsModal').style.display = 'block';
+
+                });
+                listContainer.appendChild(li);
+            });
+
             document.getElementById("eventModal").style.display = "block";
         }
     });

@@ -2,7 +2,7 @@
 <html lang="cs">
 <head>
   <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no" />
   <title>Rezervace lekcí</title>
   <link rel="stylesheet" href="/css/index.css">
   <script src="https://cdn.jsdelivr.net/npm/fullcalendar/index.global.min.js"></script>
@@ -22,6 +22,15 @@
     <p><strong>Rezervace:</strong> <span id="modal-reservations"></span></p>
     <div id="modal-message">Kapacita lekce naplněna.</div>
     <button id="createReservationBtn">➕ Vytvořit rezervaci</button>
+
+<!--    Zobrazení zervačního listu-->
+    <hr>
+
+    <div id="reservationsList">
+      <h4>Rezervace</h4>
+      <ul id="reservationsContainer"></ul>
+    </div>
+
   </div>
 </div>
 
