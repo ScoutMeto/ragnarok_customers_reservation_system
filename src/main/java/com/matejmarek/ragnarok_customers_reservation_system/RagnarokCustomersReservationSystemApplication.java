@@ -15,11 +15,6 @@ public class RagnarokCustomersReservationSystemApplication {
 
 }
 
-//
-// Je třeba metody otestovat ->
-//vše přes POSTMANa.
-// Pak se budeme zabývat basic frontendem.
-//POZN.: některé metody už navracejí ještě neexistující xxx.html stránky. Vytvoř pro účely testování nějaké šablony.
 
 //pro testování:
 //admin@example.com

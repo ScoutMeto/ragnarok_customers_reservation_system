@@ -2,6 +2,7 @@ package com.matejmarek.ragnarok_customers_reservation_system.dto.mapper;
 
 import com.matejmarek.ragnarok_customers_reservation_system.dto.ReservationDTO;
 import com.matejmarek.ragnarok_customers_reservation_system.entity.ReservationEntity;
+import org.mapstruct.Mapping;
 import org.springframework.stereotype.Component;
 
 import java.util.List;
@@ -44,6 +45,7 @@ public class ReservationMapper {
         return entity;
     }
 
+    @Mapping(target = "training", ignore = true)
     public ReservationDTO toDTO(ReservationEntity entity) {
         if (entity == null) {
             return null;

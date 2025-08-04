@@ -1,5 +1,6 @@
 package com.matejmarek.ragnarok_customers_reservation_system.entity;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import jakarta.persistence.*;
 import jakarta.validation.constraints.Max;
@@ -18,6 +19,7 @@ public class ReservationEntity {
 
     @ManyToOne(fetch = FetchType.EAGER)
     @JoinColumn(name = "training_id", nullable = false)
+    @JsonIgnore
     private TrainingEntity training;
 
     @Column(nullable = false)
