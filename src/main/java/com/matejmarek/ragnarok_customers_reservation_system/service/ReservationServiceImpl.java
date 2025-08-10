@@ -9,6 +9,7 @@ import com.matejmarek.ragnarok_customers_reservation_system.entity.repository.Tr
 import jakarta.persistence.EntityNotFoundException;
 import jakarta.transaction.Transactional;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.cache.annotation.CacheEvict;
 import org.springframework.stereotype.Service;
 
 @Service
@@ -23,6 +24,7 @@ public class ReservationServiceImpl implements ReservationService {
 
     @Override
     @Transactional
+    @CacheEvict(value = "trainingsByMonth", allEntries = true)
     public ReservationDTO createReservation(ReservationDTO reservationDTO) {
         TrainingEntity trainingEntity = trainingRepository.findById(reservationDTO.getTrainingId())
                 .orElseThrow(() -> new EntityNotFoundException("Trénink s ID " + reservationDTO.getTrainingId() + " nenalezen."));
@@ -38,6 +40,7 @@ public class ReservationServiceImpl implements ReservationService {
 
     @Override
     @Transactional
+    @CacheEvict(value = "trainingsByMonth", allEntries = true)
     public ReservationDTO editReservation(Long reservationId, ReservationDTO reservationDTO) {
         // Najdeme rezervaci podle ID
         ReservationEntity existingReservation = reservationRepository.findById(reservationId)
@@ -59,6 +62,7 @@ public class ReservationServiceImpl implements ReservationService {
     }
 
     @Override
+    @CacheEvict(value = "trainingsByMonth", allEntries = true)
     public void deleteReservation(Long reservationId) {
         int removed = reservationRepository.deleteByReservationIdJPQL(reservationId);
         if (removed == 0) {

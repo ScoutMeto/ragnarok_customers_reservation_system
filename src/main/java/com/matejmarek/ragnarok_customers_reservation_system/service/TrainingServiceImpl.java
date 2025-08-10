@@ -10,7 +10,10 @@ import com.matejmarek.ragnarok_customers_reservation_system.entity.repository.Tr
 import jakarta.persistence.EntityNotFoundException;
 import jakarta.transaction.Transactional;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.cache.annotation.CacheEvict;
+import org.springframework.cache.annotation.Cacheable;
 import org.springframework.stereotype.Service;
+import org.springframework.cache.annotation.Cacheable;
 
 import java.util.*;
 import java.util.stream.Collectors;
@@ -32,6 +35,7 @@ public class TrainingServiceImpl implements TrainingService {
 
     @Override
     @Transactional
+    @CacheEvict(value = "trainingsByMonth", allEntries = true)
     public TrainingDTO createTraining(TrainingDTO trainingDTO) {
         // Ruční vytvoření nové entitní instance (mapper zlobil)
         TrainingEntity trainingEntity = new TrainingEntity();
@@ -95,6 +99,7 @@ public class TrainingServiceImpl implements TrainingService {
 
     // Data pro kalendář
     @Override
+    @Cacheable(value = "trainingsByMonth", key = "#startDate.toString() + '-' + #endDate.toString()")
     public List<TrainingResponseDTO> getAllTrainingsAsCalendarEvents(LocalDateTime startDate, LocalDateTime endDate) {
         List<TrainingEntity> trainings = trainingRepository.findByDateOfCurrentLessonBetween(startDate, endDate);
 
@@ -149,6 +154,7 @@ public class TrainingServiceImpl implements TrainingService {
     //Vymazat 1 trénink a všechny jeho rezervace.
     @Transactional
     @Override
+    @CacheEvict(value = "trainingsByMonth", allEntries = true)
     public void removeOneTraining(Long trainingId) {
         // Najdi trénink podle ID
         TrainingEntity trainingEntity = trainingRepository.findById(trainingId)
@@ -162,6 +168,7 @@ public class TrainingServiceImpl implements TrainingService {
     // Odstranit všechny vybrané tréninky (i jejich rezervace).
     @Transactional
     @Override
+    @CacheEvict(value = "trainingsByMonth", allEntries = true)
     public void removeAimedTrainings(List<Long> trainingIds) {
         // Najdi trénink podle ID
         for (Long id : trainingIds) {
@@ -183,6 +190,7 @@ public class TrainingServiceImpl implements TrainingService {
          */
     @Transactional
     @Override
+    @CacheEvict(value = "trainingsByMonth", allEntries = true)
     public void removeAllPlannedTrainings(Long trainingId) {
         TrainingEntity clickedTraining = trainingRepository.findById(trainingId)
                 .orElseThrow(() -> new EntityNotFoundException("Trénink nenalezen."));
@@ -205,6 +213,7 @@ public class TrainingServiceImpl implements TrainingService {
     // Editace - jeden trénink
     @Transactional
     @Override
+    @CacheEvict(value = "trainingsByMonth", allEntries = true)
     public TrainingDTO editOneTraining(Long trainingId, TrainingDTO trainingDTO) {
         TrainingEntity trainingEntity = trainingRepository.findById(trainingId)
                 .orElseThrow(() -> new EntityNotFoundException("Trénink podle zadaného ID " + trainingId + " nenalezen."));
@@ -234,6 +243,7 @@ public class TrainingServiceImpl implements TrainingService {
     // Editace - všechny následující tréninky
     @Transactional
     @Override
+    @CacheEvict(value = "trainingsByMonth", allEntries = true)
     public void editAllPlannedTrainings(Long trainingId, TrainingDTO trainingDTO) {
         TrainingEntity clickedTraining = trainingRepository.findById(trainingId)
                 .orElseThrow(() -> new EntityNotFoundException("Trénink nenalezen."));
