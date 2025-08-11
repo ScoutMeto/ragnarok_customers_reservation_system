@@ -21,7 +21,10 @@ public class CacheConfig {
                 .weakValues();
 
         CaffeineCacheManager mgr = new CaffeineCacheManager("trainingsByMonth");
-        mgr.setCaffeine(spec);
+        mgr.setCaffeine(Caffeine.newBuilder()
+                .maximumSize(999)
+                .expireAfterWrite(Duration.ofMinutes(10))
+                .recordStats());
         return mgr;
     }
 }
