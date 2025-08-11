@@ -33,7 +33,7 @@ public class ApplicationSecurityConfiguration {
                 )
                 .authorizeHttpRequests(auth -> auth
                         // frontend veřejně přístupný
-                        .requestMatchers("/", "/index.html", "/js/**", "/css/**").permitAll()
+                        .requestMatchers("/", "/index.html", "/js/**", "/css/**","/actuator/**").permitAll()
                         // veřejné API
                         .requestMatchers("/api/loginAdmin").permitAll()
                         .requestMatchers(HttpMethod.GET, "/api/loadAllTrainings").permitAll()
