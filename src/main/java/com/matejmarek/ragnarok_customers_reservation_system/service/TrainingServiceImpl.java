@@ -144,6 +144,7 @@ public class TrainingServiceImpl implements TrainingService {
     // Přípravná metoda to delete/edit - zobrazí trénink pro úpravu po kliknutí na přehled v celém týdnu a umožní vybrat z možností: vymzat/upravit (při volbě předá ID další funkci)
     // (vyřešeno)Zisk údajů pro proměnnou List<ReservationEntity> reservationsList (každá jednotka) - vyřešeno pomocí fetch.EAGER
     @Override
+    @CacheEvict(value = "trainingsByMonth", allEntries = true)
     public TrainingDTO getOneTrainingById(Long trainingId) {
         TrainingEntity trainingEntity = trainingRepository.findById(trainingId)
                 .orElseThrow(() -> new EntityNotFoundException("Trénink podle zadaného id " + trainingId + " nenalezen v databázi."));
