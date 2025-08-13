@@ -102,7 +102,7 @@ public class TrainingServiceImpl implements TrainingService {
     // Data pro kalendář
     @Override
 //    @Cacheable(value = "trainingsByMonth", key = "#startDate.toLocalDate().toString() + '-' + #endDate.toLocalDate().toString()")
-    @Cacheable(value = "trainingsByMonth", keyGenerator = "dateRangeKeyGenerator")
+    @Cacheable(value = "trainingsByMonth")
     public List<TrainingResponseDTO> getAllTrainingsAsCalendarEvents(LocalDateTime startDate, LocalDateTime endDate) {
         List<TrainingEntity> trainings = trainingRepository.findByDateOfCurrentLessonBetween(startDate, endDate);
 
