@@ -12,6 +12,7 @@ import jakarta.transaction.Transactional;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.cache.annotation.CacheEvict;
 import org.springframework.cache.annotation.Cacheable;
+import org.springframework.cache.annotation.EnableCaching;
 import org.springframework.stereotype.Service;
 import org.springframework.cache.annotation.Cacheable;
 
@@ -99,7 +100,7 @@ public class TrainingServiceImpl implements TrainingService {
 
     // Data pro kalendář
     @Override
-    @Cacheable(value = "trainingsByMonth", key = "#startDate.toString() + '-' + #endDate.toString()")
+    @Cacheable(value = "trainingsByMonth", key = "#startDate.toLocalDate().toString() + '-' + #endDate.toLocalDate().toString()")
     public List<TrainingResponseDTO> getAllTrainingsAsCalendarEvents(LocalDateTime startDate, LocalDateTime endDate) {
         List<TrainingEntity> trainings = trainingRepository.findByDateOfCurrentLessonBetween(startDate, endDate);
 

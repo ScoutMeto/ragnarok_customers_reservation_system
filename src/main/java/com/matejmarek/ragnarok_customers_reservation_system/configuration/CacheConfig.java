@@ -23,7 +23,7 @@ public class CacheConfig {
         CaffeineCacheManager mgr = new CaffeineCacheManager("trainingsByMonth");
         mgr.setCaffeine(Caffeine.newBuilder()
                 .maximumSize(999)
-                .expireAfterWrite(Duration.ofMinutes(10))
+                .expireAfterWrite(Duration.ofMinutes(3))
                 .recordStats());
         return mgr;
     }
