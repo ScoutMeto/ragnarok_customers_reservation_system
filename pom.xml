@@ -139,10 +139,15 @@
 			<scope>compile</scope>
 		</dependency>
 
-		<!--cache managing-->
+<!--		&lt;!&ndash;cache managing via caffeine&ndash;&gt;-->
+<!--		<dependency>-->
+<!--			<groupId>com.github.ben-manes.caffeine</groupId>-->
+<!--			<artifactId>caffeine</artifactId>-->
+<!--		</dependency>-->
+		<!--cache managing via Redis-->
 		<dependency>
-			<groupId>com.github.ben-manes.caffeine</groupId>
-			<artifactId>caffeine</artifactId>
+			<groupId>org.springframework.boot</groupId>
+			<artifactId>spring-boot-starter-data-redis</artifactId>
 		</dependency>
 		<dependency>
 			<groupId>org.springframework.boot</groupId>
