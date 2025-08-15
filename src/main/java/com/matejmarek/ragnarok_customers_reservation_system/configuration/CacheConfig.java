@@ -12,6 +12,9 @@ import java.time.Duration;
 
 @Configuration
 @EnableCaching
+public class CacheConfig {
+}
+
 //public class CacheConfig {
 //
 //    @Bean
@@ -29,23 +32,23 @@ import java.time.Duration;
 //        return mgr;
 //    }
 //}
-
-public class CacheConfig {
-// 1) Caffeine CacheManager (vezme spec z application.properties)
-@Bean
-public CacheManager cacheManager() {
-    return new CaffeineCacheManager("trainingsByMonth");
-}
-
-// 2) Globální KeyGenerator – ořízne LocalDateTime na LocalDate
-//    => "dnešní týden/měsíc" má stejný klíč, i když ping přijde v 10:00 nebo 10:30.
-@Bean(name = "keyGenerator")
-public KeyGenerator dateRangeKeyGenerator() {
-    return (target, method, params) -> {
-        Object[] normalized = java.util.Arrays.stream(params)
-                .map(p -> (p instanceof java.time.LocalDateTime ldt) ? ldt.toLocalDate() : p)
-                .toArray();
-        return new org.springframework.cache.interceptor.SimpleKey(normalized);
-    };
-}
-}
+//
+//public class CacheConfig {
+//// 1) Caffeine CacheManager (vezme spec z application.properties)
+//@Bean
+//public CacheManager cacheManager() {
+//    return new CaffeineCacheManager("trainingsByMonth");
+//}
+//
+//// 2) Globální KeyGenerator – ořízne LocalDateTime na LocalDate
+////    => "dnešní týden/měsíc" má stejný klíč, i když ping přijde v 10:00 nebo 10:30.
+//@Bean(name = "keyGenerator")
+//public KeyGenerator dateRangeKeyGenerator() {
+//    return (target, method, params) -> {
+//        Object[] normalized = java.util.Arrays.stream(params)
+//                .map(p -> (p instanceof java.time.LocalDateTime ldt) ? ldt.toLocalDate() : p)
+//                .toArray();
+//        return new org.springframework.cache.interceptor.SimpleKey(normalized);
+//    };
+//}
+//}
