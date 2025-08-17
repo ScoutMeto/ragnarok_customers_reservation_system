@@ -1,5 +1,7 @@
 package com.matejmarek.ragnarok_customers_reservation_system.configuration;
 
+import com.fasterxml.jackson.databind.ObjectMapper;
+import com.fasterxml.jackson.datatype.jsr310.JavaTimeModule;
 import org.springframework.cache.CacheManager;
 import org.springframework.cache.annotation.EnableCaching;
 import org.springframework.cache.interceptor.KeyGenerator;
@@ -23,33 +25,27 @@ public class RedisCacheConfig {
 
     @Bean
     public CacheManager cacheManager(RedisConnectionFactory cf) {
-//        RedisCacheConfiguration defaults = RedisCacheConfiguration.defaultCacheConfig()
-//                .entryTtl(Duration.ofMinutes(1))
-//                .disableCachingNullValues()
-//                .serializeValuesWith(
-//                        RedisSerializationContext.SerializationPair
-//                                .fromSerializer(new GenericJackson2JsonRedisSerializer())
-//                );
-//
-//        return RedisCacheManager.builder(cf)
-//                .cacheDefaults(defaults)
-//                .withInitialCacheConfigurations(
-//                        Map.of("trainingsByMonth", defaults)
-//                )
-//                .build();
-//    }
-        // TTL převezme z application.properties (spring.cache.redis.time-to-live)
-        return RedisCacheManager.builder(cf).build();
+        ObjectMapper om = new ObjectMapper().registerModule(new JavaTimeModule());
+        GenericJackson2JsonRedisSerializer ser = new GenericJackson2JsonRedisSerializer(om);
+
+        RedisCacheConfiguration cfg = RedisCacheConfiguration.defaultCacheConfig()
+                .entryTtl(Duration.ofMinutes(3))
+                .disableCachingNullValues()
+                .serializeValuesWith(RedisSerializationContext.SerializationPair.fromSerializer(ser));
+
+        return RedisCacheManager.builder(cf)
+                .cacheDefaults(cfg)
+                .withInitialCacheConfigurations(Map.of("trainingsByMonth", cfg))
+                .build();
     }
 
     @Bean(name = "keyGenerator")
     public KeyGenerator dateRangeKeyGenerator() {
-        return (target, method, params) -> {
-            Object[] normalized = Arrays.stream(params)
-                    .map(p -> (p instanceof LocalDateTime ldt) ? ldt.toLocalDate() : p)
-                    .toArray();
-            return new SimpleKey(normalized);
-        };
+        return (t, m, p) -> new SimpleKey(
+                java.util.Arrays.stream(p)
+                        .map(v -> (v instanceof java.time.LocalDateTime ldt) ? ldt.toLocalDate() : v)
+                        .toArray()
+        );
     }
 }
 
