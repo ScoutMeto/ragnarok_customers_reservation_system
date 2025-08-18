@@ -25,7 +25,8 @@ public class ReservationServiceImpl implements ReservationService {
 
     @Override
     @Transactional
-    @CacheEvict(value = "trainingsByMonth", allEntries = true)    public ReservationDTO createReservation(ReservationDTO reservationDTO) {
+//    @CacheEvict(value = "trainingsByMonth", allEntries = true)
+    public ReservationDTO createReservation(ReservationDTO reservationDTO) {
         TrainingEntity trainingEntity = trainingRepository.findById(reservationDTO.getTrainingId())
                 .orElseThrow(() -> new EntityNotFoundException("Trénink s ID " + reservationDTO.getTrainingId() + " nenalezen."));
 
@@ -40,7 +41,8 @@ public class ReservationServiceImpl implements ReservationService {
 
     @Override
     @Transactional
-    @CacheEvict(value = "trainingsByMonth", allEntries = true)    public ReservationDTO editReservation(Long reservationId, ReservationDTO reservationDTO) {
+//    @CacheEvict(value = "trainingsByMonth", allEntries = true)
+    public ReservationDTO editReservation(Long reservationId, ReservationDTO reservationDTO) {
         // Najdeme rezervaci podle ID
         ReservationEntity existingReservation = reservationRepository.findById(reservationId)
                 .orElseThrow(() -> new EntityNotFoundException("Rezervace s ID " + reservationId + " nenalezena."));
@@ -61,7 +63,8 @@ public class ReservationServiceImpl implements ReservationService {
     }
 
     @Override
-    @CacheEvict(value = "trainingsByMonth", allEntries = true)    public void deleteReservation(Long reservationId) {
+//    @CacheEvict(value = "trainingsByMonth", allEntries = true)
+    public void deleteReservation(Long reservationId) {
         int removed = reservationRepository.deleteByReservationIdJPQL(reservationId);
         if (removed == 0) {
             throw new EntityNotFoundException("Rezervace s ID " + reservationId + " nenalezena.");
