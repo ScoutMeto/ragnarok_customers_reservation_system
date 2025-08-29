@@ -334,3 +334,11 @@ automatická výška calendar skrz celou výšku obrazovky zařízení
 .fc-day-has-more {
     background-color: rgba(58, 146, 246, 0.2); /* modrá */
 }
+
+/*formátování GDPR oznámení*/
+.form-privacy-hint {
+    font-size: 0.85rem;
+    opacity: 0.8;
+    margin: 0.5rem 0 0.75rem 0;
+}
+.form-privacy-hint a { text-decoration: underline; }

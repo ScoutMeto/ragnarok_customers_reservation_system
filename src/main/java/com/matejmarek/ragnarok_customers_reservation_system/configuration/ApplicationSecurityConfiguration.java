@@ -33,13 +33,13 @@ public class ApplicationSecurityConfiguration {
                 )
                 .authorizeHttpRequests(auth -> auth
                         // frontend veřejně přístupný
-                        .requestMatchers("/", "/index.html", "/js/**", "/css/**","/actuator/**").permitAll()
+                        .requestMatchers("/", "/index.html", "/index-gdpr.html", "/js/**", "/css/**","/actuator/**").permitAll()
                         // veřejné API
                         .requestMatchers("/api/loginAdmin").permitAll()
                         .requestMatchers(HttpMethod.GET, "/api/loadAllTrainings").permitAll()
                         .requestMatchers(HttpMethod.POST, "/api/createNewReservation").permitAll()
                         // chráněné API pro přihlášené adminy
-                        .requestMatchers("/index-adminPart.html").hasRole("ADMIN")
+                        .requestMatchers("/index-adminPart.html", "/index-gdpr.html").hasRole("ADMIN")
                         .requestMatchers("/api/**").hasRole("ADMIN")
                         .anyRequest().authenticated()
                 )
