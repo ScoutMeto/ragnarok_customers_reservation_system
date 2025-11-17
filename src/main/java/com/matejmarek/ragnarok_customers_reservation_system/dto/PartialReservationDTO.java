@@ -2,7 +2,6 @@ package com.matejmarek.ragnarok_customers_reservation_system.dto;
 
 import com.fasterxml.jackson.annotation.JsonProperty;
 import com.matejmarek.ragnarok_customers_reservation_system.entity.TrainingEntity;
-import jakarta.validation.constraints.*;
 import lombok.*;
 import org.springframework.beans.factory.annotation.Value;
 import lombok.Getter;
@@ -13,7 +12,7 @@ import lombok.Setter;
 @AllArgsConstructor
 @Getter
 @Setter
-public class ReservationDTO{
+public class PartialReservationDTO{
 
     @JsonProperty("reservation_id")
     private Long reservationId;
@@ -22,19 +21,12 @@ public class ReservationDTO{
 
     private TrainingEntity training;
 
-    @NotBlank @Size(max=60)
     private String firstName;
 
-    @NotBlank @Size(max=60)
     private String secondName;
 
-    @Email @Size(max=120)
-    private String userEmail;
-
-    private String telephoneNumber;
-
     private boolean admin;
-    @Min(0) @Max(10)
+
     private int numberOfBookedEntries = 1;
 
     @Value("true")

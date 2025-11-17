@@ -670,7 +670,7 @@ document.addEventListener("DOMContentLoaded", function () {
         fetch('/api/logoutAdmin', { method: 'POST' })
             .then(resp => {
                 if (resp.ok)
-                    window.location.href = '/index.html';
+                    window.location.href = '/';
                 else alert('Odhlášení se nezdařilo.');
             })
             .catch(err => console.error('Logout error:', err));

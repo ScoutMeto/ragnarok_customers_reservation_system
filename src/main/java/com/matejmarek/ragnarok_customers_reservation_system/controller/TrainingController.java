@@ -1,6 +1,7 @@
 package com.matejmarek.ragnarok_customers_reservation_system.controller;
 
 import com.matejmarek.ragnarok_customers_reservation_system.dto.AimedTrainingsRequestDTO;
+import com.matejmarek.ragnarok_customers_reservation_system.dto.PartialTrainingResponseDTO;
 import com.matejmarek.ragnarok_customers_reservation_system.dto.TrainingDTO;
 import com.matejmarek.ragnarok_customers_reservation_system.dto.TrainingResponseDTO;
 import com.matejmarek.ragnarok_customers_reservation_system.entity.repository.TrainingRepository;
@@ -54,6 +55,25 @@ public class TrainingController {
         System.out.println("Backend DEBUG: start=" + startDate + ", end=" + endDate);
         return trainingService.getAllTrainingsAsCalendarEvents(startDate, endDate);
     }
+
+
+    ////////////////////////////////////////////////////////////////////////////////////////
+
+
+    @GetMapping({"api/loadAllTrainingsWithoutAuthorization", "api/loadAllTrainingsWithoutAuthorization/"})
+    public List<PartialTrainingResponseDTO> getTrainingsForCalendarWithoutAuthorization(
+
+        @RequestParam("start") OffsetDateTime start,
+        @RequestParam("end") OffsetDateTime end) {
+
+            LocalDateTime startDate = start.toLocalDateTime();
+            LocalDateTime endDate = end.toLocalDateTime();
+
+
+            System.out.println("Backend DEBUG: start=" + startDate + ", end=" + endDate);
+            return trainingService.getAllTrainingsAsCalendarEventsForUnauthorizedUser(startDate, endDate);
+    }
+
 
     ////////////////////////////////////////////////////////////////////////////////////////
 

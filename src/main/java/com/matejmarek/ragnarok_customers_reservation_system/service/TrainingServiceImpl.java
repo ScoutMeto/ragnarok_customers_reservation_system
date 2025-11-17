@@ -1,8 +1,6 @@
 package com.matejmarek.ragnarok_customers_reservation_system.service;
 
-import com.matejmarek.ragnarok_customers_reservation_system.dto.ReservationDTO;
-import com.matejmarek.ragnarok_customers_reservation_system.dto.TrainingDTO;
-import com.matejmarek.ragnarok_customers_reservation_system.dto.TrainingResponseDTO;
+import com.matejmarek.ragnarok_customers_reservation_system.dto.*;
 import com.matejmarek.ragnarok_customers_reservation_system.dto.mapper.ReservationMapper;
 import com.matejmarek.ragnarok_customers_reservation_system.dto.mapper.TrainingMapper;
 import com.matejmarek.ragnarok_customers_reservation_system.entity.TrainingEntity;
@@ -136,6 +134,56 @@ public class TrainingServiceImpl implements TrainingService {
             extendedProps.put("reservations", reservationDTOs);
             extendedProps.put("trainingId", training.getTrainingId());
 
+
+            dto.setExtendedProps(extendedProps);
+
+            return dto;
+        }).toList();
+    }
+
+
+    // Data pro kalendář bez "admin" oprávnění
+    @Override
+    public List<PartialTrainingResponseDTO> getAllTrainingsAsCalendarEventsForUnauthorizedUser(LocalDateTime startDate, LocalDateTime endDate) {
+
+        List<TrainingEntity> trainings = trainingRepository
+                .findByDateOfCurrentLessonBetween(startDate, endDate);
+
+        return trainings.stream().map(training -> {
+            PartialTrainingResponseDTO dto = new PartialTrainingResponseDTO();
+            dto.setTrainingId(training.getTrainingId());
+            dto.setTitle(training.getNameOfLesson());
+            dto.setStart(training.getStartOfCurrentLesson());
+            dto.setEnd(training.getEndOfCurrentLesson());
+
+            // mapování rezervací BEZ mutace entit:
+            List<PartialReservationDTO> partialReservationDTOs = training.getReservations().stream()
+                    .map(reservationMapper::toPartialDTO)
+                    .collect(Collectors.toList());
+            dto.setReservations(partialReservationDTOs);
+
+            // 2) výpočet extra rezervovaných míst (když je numberOfBookedEntries > 1)
+//            int extraReservations = partialReservationDTOs.stream()
+//                    .mapToInt(r -> Math.max(0, r.getNumberOfBookedEntries() - 1))
+//                    .sum();
+
+            // Kontrola počtu rezervovaných míst a jejich případné započítání do celkového počtu rezervací
+            int extraReservations = 0;
+            for (PartialReservationDTO partialReservationDTO : partialReservationDTOs) {
+                int checkingNumberOfReservations = partialReservationDTO.getNumberOfBookedEntries();
+                if (checkingNumberOfReservations > 1) {
+                    extraReservations += partialReservationDTO.getNumberOfBookedEntries() - 1;
+                }
+            }
+
+            // 3) extendedProps pro FullCalendar
+            Map<String, Object> extendedProps = new HashMap<>();
+            extendedProps.put("lessonName", training.getNameOfLesson());
+            extendedProps.put("coachName", training.getCoachName());
+            extendedProps.put("numberOfFreeSlots", training.getNumberOfFreeSlots());
+            extendedProps.put("numberOfReservations", partialReservationDTOs.size() + extraReservations);
+            extendedProps.put("reservations", partialReservationDTOs);
+            extendedProps.put("trainingId", training.getTrainingId());
 
             dto.setExtendedProps(extendedProps);
 

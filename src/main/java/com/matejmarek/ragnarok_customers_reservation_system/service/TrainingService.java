@@ -1,5 +1,6 @@
 package com.matejmarek.ragnarok_customers_reservation_system.service;
 
+import com.matejmarek.ragnarok_customers_reservation_system.dto.PartialTrainingResponseDTO;
 import com.matejmarek.ragnarok_customers_reservation_system.dto.TrainingDTO;
 import com.matejmarek.ragnarok_customers_reservation_system.dto.TrainingResponseDTO;
 import org.springframework.stereotype.Service;
@@ -13,6 +14,8 @@ public interface TrainingService {
 
     // (vyřešeno)Zisk údajů pro proměnnou List<ReservationEntity> reservationsList (každá jednotka) - vyřešeno pomocí fetch.EAGER
     List<TrainingResponseDTO> getAllTrainingsAsCalendarEvents(LocalDateTime startDate, LocalDateTime endDate);
+
+    List<PartialTrainingResponseDTO> getAllTrainingsAsCalendarEventsForUnauthorizedUser(LocalDateTime startDate, LocalDateTime endDate);
 
     TrainingDTO getOneTrainingById(Long trainingId);
 

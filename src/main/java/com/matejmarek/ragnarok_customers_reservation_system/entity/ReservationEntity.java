@@ -6,6 +6,7 @@ import jakarta.persistence.*;
 import jakarta.validation.constraints.Max;
 import lombok.Getter;
 import lombok.Setter;
+import org.hibernate.type.descriptor.jdbc.VarcharJdbcType;
 
 @Entity(name = "reservations")
 @Table(name = "reservations")
@@ -32,7 +33,7 @@ public class ReservationEntity {
     private String userEmail;
 
     @Column(nullable = false)
-    private int telephoneNumber;
+    private String telephoneNumber;
 
     @JsonProperty("isAdmin")
     private boolean admin = false;

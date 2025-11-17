@@ -53,7 +53,7 @@ document.addEventListener("DOMContentLoaded", function () {
         // height: 'auto',
 
         events: {
-            url: "/api/loadAllTrainings",
+            url: '/api/loadAllTrainingsWithoutAuthorization',
             method: "GET",
             failure: () => alert("Chyba při načítání lekcí")
         },
@@ -115,8 +115,7 @@ document.addEventListener("DOMContentLoaded", function () {
 
             reservations.forEach(res => {
                 const li = document.createElement("li");
-                const shortSecondName = res.secondName ? res.secondName.charAt(0) + '.' : '';
-                li.textContent = `${res.firstName} ${shortSecondName}, ${res.numberOfBookedEntries} (počet osob)`;
+                li.textContent = `${res.firstName} ${res.secondName}, ${res.numberOfBookedEntries} (počet osob)`;
                 li.style.cursor = "pointer";
                 li.addEventListener("click", () => {
                     window.selectedReservationId = res.reservation_id; // ID rezervace globálně dostupné
@@ -234,7 +233,7 @@ async function login() {
     });
 
     if (res.ok) {
-        window.location.href = '/index-adminPart.html';
+        window.location.href = '/admin';
     } else {
         showToast("Přihlášení selhalo.");
         alert('Přihlášení selhalo');

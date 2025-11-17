@@ -48,13 +48,17 @@
       <label for="userEmail">E-mail:</label>
       <input type="email" id="userEmail" name="userEmail" placeholder="nepovinný údaj"><br><br>
       <label for="phone">Telefon:</label>
-      <input type="tel" id="phone" name="telephoneNumber" required><br><br>
+      <input type="tel" id="phone" name="telephoneNumber" pattern="^\+?[0-9\s-]{9,20}$" required><br><br>
       <label for="numberOfPeople">Počet míst:</label>
       <input type="number" id="numberOfPeople" name="numberOfBookedEntries" min="1" required><br><br>
       <p class="form-privacy-hint">
         Odesláním formuláře souhlasíte se zpracováním osobních údajů za účelem rezervace lekce.
         Více informací naleznete v
-        <a href="/index-gdpr.html" target="_blank" rel="noopener">Zásadách ochrany osobních údajů</a>.
+        <a href="/gdpr" target="_blank" rel="noopener">Zásadách ochrany osobních údajů</a>.
+
+        <br>
+        Rezervací návštěvník stvrzuje seznámení s <a href="/provozni-navstevni-rad" target="_blank" rel="noopener">návštěvním a&nbsp;provozním řádem</a> a zavazuje se jej respektovat.
+        Provozní a návštěvní řád je také k nahlédnutí na webových stránkách (v sekci "služby"), nebo ve fyzické podobě v tělocvičně Ragnarok.
       </p>
       <button type="submit" id="submitReservationBtn">Zarezervovat</button>
     </form>
