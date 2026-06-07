@@ -38,6 +38,8 @@ public class ApplicationSecurityConfiguration {
                         .requestMatchers("/api/loginAdmin").permitAll()
                         .requestMatchers(HttpMethod.GET, "/api/loadAllTrainingsWithoutAuthorization").permitAll()
                         .requestMatchers(HttpMethod.POST, "/api/createNewReservation").permitAll()
+                        // Phase 7.2: zrušení rezervace z deníku — chráněno sdíleným API klíčem v controlleru
+                        .requestMatchers(HttpMethod.DELETE, "/api/cancelReservationForClient/**").permitAll()
                         // chráněné API pro přihlášené adminy
                         .requestMatchers("/index-adminPart.html", "/admin", "/index-gdpr.html", "/index-operating_visitor_rules.html","/gdpr", "/provozni-navstevni-rad", "/api/loadAllTrainings").hasRole("ADMIN")
                         .requestMatchers("/api/**").hasRole("ADMIN")
